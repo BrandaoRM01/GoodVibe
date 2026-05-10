@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileNav } from "@/components/MobileNav";
 import { PostCard, type Post } from "@/components/PostCard";
 import { Settings, MapPin, Calendar, Heart, Trophy, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
@@ -115,6 +116,7 @@ function ProfilePage() {
           </div>
         </div>
       </main>
+      <MobileNav />
     </div>
   );
 }
