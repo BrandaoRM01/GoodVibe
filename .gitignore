@@ -1,4 +1,6 @@
-# Logs
+# =========================
+# LOGS
+# =========================
 logs
 *.log
 npm-debug.log*
@@ -7,26 +9,102 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-.output
-.vinxi
-.tanstack/**
-.nitro
-*.local
+# =========================
+# FRONTEND (React / Vite)
+# =========================
+node_modules/
+dist/
+dist-ssr/
+.output/
+.vinxi/
+.tanstack/
+.nitro/
+coverage/
 
-# Wrangler / Cloudflare
+*.local
+.env
+.env.*
+!.env.example
+
+# Vite
+vite.config.timestamp-*
+
+# =========================
+# BACKEND (Python / Flask)
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.env/
+ENV/
+env/
+
+# Flask
+instance/
+.webassets-cache/
+
+# SQLAlchemy
+*.db
+*.sqlite3
+
+# Pytest
+.pytest_cache/
+
+# Mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# =========================
+# UPLOADS / MEDIA
+# =========================
+uploads/
+media/
+static/uploads/
+
+# =========================
+# BUILD / CACHE
+# =========================
+.cache/
+tmp/
+temp/
+
+# =========================
+# CLOUD / DEPLOY
+# =========================
 .wrangler/
 .dev.vars
 
-# Editor directories and files
+.vercel/
+.netlify/
+
+# =========================
+# EDITORS / IDEs
+# =========================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+
+# =========================
+# SYSTEM FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# OPTIONAL
+# =========================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
