@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileNav } from "@/components/MobileNav";
 import { Search, Send, Smile, Paperclip, Phone, Video, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -136,6 +137,7 @@ function MessagesPage() {
           </div>
         </div>
       </main>
+      <MobileNav />
     </div>
   );
 }

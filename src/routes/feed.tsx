@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileNav } from "@/components/MobileNav";
 import { RightRail } from "@/components/RightRail";
 import { Composer } from "@/components/Composer";
 import { PostCard, type Post } from "@/components/PostCard";
@@ -61,6 +62,7 @@ function FeedPage() {
           {posts.map((p, i) => <PostCard key={p.id} post={p} index={i} />)}
         </div>
       </main>
+      <MobileNav />
       <RightRail />
     </div>
   );

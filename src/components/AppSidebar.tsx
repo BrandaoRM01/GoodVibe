@@ -17,12 +17,12 @@ export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <aside className="hidden lg:flex sticky top-0 h-screen w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-4 py-6">
-      <Link to="/feed" className="flex items-center gap-2.5 px-2 mb-4">
-        <div className="h-10 w-10 rounded-2xl gradient-primary grid place-items-center shadow-glow">
+    <aside className="hidden md:flex sticky top-0 h-screen w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-6">
+      <Link to="/feed" className="flex items-center gap-2.5 px-2 mb-4 justify-center lg:justify-start">
+        <div className="h-10 w-10 rounded-2xl gradient-primary grid place-items-center shadow-glow shrink-0">
           <Sparkles className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
         </div>
-        <span className="text-xl font-bold tracking-tight">
+        <span className="hidden lg:inline text-xl font-bold tracking-tight">
           Good<span className="gradient-text">Vib</span><span className="text-primary">&</span>
         </span>
       </Link>
@@ -35,7 +35,8 @@ export function AppSidebar() {
             <Link
               key={it.label + i}
               to={it.to}
-              className={`group relative flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
+              title={it.label}
+              className={`group relative flex items-center gap-3 px-3 lg:px-4 py-3 rounded-2xl transition-all justify-center lg:justify-start ${
                 isActive
                   ? "bg-primary/10 text-primary font-semibold"
                   : "text-foreground/70 hover:text-foreground hover:bg-accent"
@@ -48,18 +49,16 @@ export function AppSidebar() {
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
                 />
               )}
-              <it.icon className="h-5 w-5" />
-              <span className="text-sm">{it.label}</span>
+              <it.icon className="h-5 w-5 shrink-0" />
+              <span className="hidden lg:inline text-sm">{it.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto rounded-3xl p-5 gradient-primary text-primary-foreground shadow-glow">
+      <div className="hidden lg:block mt-auto rounded-3xl p-5 gradient-primary text-primary-foreground shadow-glow">
         <Heart className="h-5 w-5 mb-2" />
-        <p className="text-sm font-semibold leading-snug mb-3">
-          Espalhe boas vibrações hoje
-        </p>
+        <p className="text-sm font-semibold leading-snug mb-3">Espalhe boas vibrações hoje</p>
         <button className="w-full bg-white/20 hover:bg-white/30 transition-colors text-xs font-medium rounded-full py-2">
           Compartilhar boa ação
         </button>

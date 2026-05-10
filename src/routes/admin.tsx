@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
+import { MobileNav } from "@/components/MobileNav";
 import { Users, Heart, Flag, TrendingUp, MoreHorizontal, Search, ShieldCheck, Trash2, Check } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid } from "recharts";
 import { motion } from "framer-motion";
@@ -194,6 +195,7 @@ function AdminPage() {
           </div>
         </div>
       </main>
+      <MobileNav />
     </div>
   );
 }
