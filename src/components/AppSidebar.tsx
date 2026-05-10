@@ -18,11 +18,11 @@ export function AppSidebar() {
 
   return (
     <aside className="hidden md:flex sticky top-0 h-screen w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-6">
-      <Link to="/feed" className="flex items-center gap-2.5 px-2 mb-4">
-        <div className="h-10 w-10 rounded-2xl gradient-primary grid place-items-center shadow-glow">
+      <Link to="/feed" className="flex items-center gap-2.5 px-2 mb-4 justify-center lg:justify-start">
+        <div className="h-10 w-10 rounded-2xl gradient-primary grid place-items-center shadow-glow shrink-0">
           <Sparkles className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
         </div>
-        <span className="text-xl font-bold tracking-tight">
+        <span className="hidden lg:inline text-xl font-bold tracking-tight">
           Good<span className="gradient-text">Vib</span><span className="text-primary">&</span>
         </span>
       </Link>
