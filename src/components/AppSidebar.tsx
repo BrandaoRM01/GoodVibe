@@ -56,11 +56,9 @@ export function AppSidebar() {
         })}
       </nav>
 
-      <div className="mt-auto rounded-3xl p-5 gradient-primary text-primary-foreground shadow-glow">
+      <div className="hidden lg:block mt-auto rounded-3xl p-5 gradient-primary text-primary-foreground shadow-glow">
         <Heart className="h-5 w-5 mb-2" />
-        <p className="text-sm font-semibold leading-snug mb-3">
-          Espalhe boas vibrações hoje
-        </p>
+        <p className="text-sm font-semibold leading-snug mb-3">Espalhe boas vibrações hoje</p>
         <button className="w-full bg-white/20 hover:bg-white/30 transition-colors text-xs font-medium rounded-full py-2">
           Compartilhar boa ação
         </button>
