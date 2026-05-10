@@ -35,7 +35,8 @@ export function AppSidebar() {
             <Link
               key={it.label + i}
               to={it.to}
-              className={`group relative flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${
+              title={it.label}
+              className={`group relative flex items-center gap-3 px-3 lg:px-4 py-3 rounded-2xl transition-all justify-center lg:justify-start ${
                 isActive
                   ? "bg-primary/10 text-primary font-semibold"
                   : "text-foreground/70 hover:text-foreground hover:bg-accent"
@@ -48,8 +49,8 @@ export function AppSidebar() {
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
                 />
               )}
-              <it.icon className="h-5 w-5" />
-              <span className="text-sm">{it.label}</span>
+              <it.icon className="h-5 w-5 shrink-0" />
+              <span className="hidden lg:inline text-sm">{it.label}</span>
             </Link>
           );
         })}
