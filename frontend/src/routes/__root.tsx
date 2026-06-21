@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/lib/theme";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -74,17 +75,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "GoodVib& — A rede social das boas ações" },
-      { name: "description", content: "Conecte-se em uma rede social acolhedora, focada em empatia, bem-estar coletivo e boas vibrações." },
+      {
+        name: "description",
+        content:
+          "Conecte-se em uma rede social acolhedora, focada em empatia, bem-estar coletivo e boas vibrações.",
+      },
       { name: "author", content: "GoodVib&" },
       { property: "og:title", content: "GoodVib& — A rede social das boas ações" },
-      { property: "og:description", content: "Conecte-se em uma rede social acolhedora, focada em empatia, bem-estar coletivo e boas vibrações." },
+      {
+        property: "og:description",
+        content:
+          "Conecte-se em uma rede social acolhedora, focada em empatia, bem-estar coletivo e boas vibrações.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "GoodVib& — A rede social das boas ações" },
-      { name: "twitter:description", content: "Conecte-se em uma rede social acolhedora, focada em empatia, bem-estar coletivo e boas vibrações." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9836cf34-d948-43af-99ca-ec68df738a33/id-preview-e6f63948--98efdc39-b906-4c77-9142-d815eb32da4a.lovable.app-1778427154767.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9836cf34-d948-43af-99ca-ec68df738a33/id-preview-e6f63948--98efdc39-b906-4c77-9142-d815eb32da4a.lovable.app-1778427154767.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Conecte-se em uma rede social acolhedora, focada em empatia, bem-estar coletivo e boas vibrações.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9836cf34-d948-43af-99ca-ec68df738a33/id-preview-e6f63948--98efdc39-b906-4c77-9142-d815eb32da4a.lovable.app-1778427154767.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9836cf34-d948-43af-99ca-ec68df738a33/id-preview-e6f63948--98efdc39-b906-4c77-9142-d815eb32da4a.lovable.app-1778427154767.png",
+      },
     ],
     links: [
       {
@@ -120,6 +141,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <Outlet />
+        <Toaster />
       </ThemeProvider>
     </QueryClientProvider>
   );
