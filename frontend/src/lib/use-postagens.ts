@@ -12,6 +12,8 @@ import {
   type TagSugestaoAPI,
   apiTagsTendencias,
   TagTendenciaAPI,
+  apiEditarPostagem,
+  type EditarPostagemPayload,
 } from "./postagens";
 
 export function useSugestoesTags(termo: string) {
@@ -100,5 +102,16 @@ export function useTagsTendencias() {
     queryKey: ["tags-tendencias"],
     queryFn: apiTagsTendencias,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useEditarPostagem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: number; payload: EditarPostagemPayload }) => apiEditarPostagem(id, payload),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["postagem", variables.id] });
+    },
   });
 }

@@ -25,6 +25,11 @@ def buscar_postagem(id_postagem):
 def cadastrar_postagem():
     return controller.cadastrar_postagem()
 
+@postagem_bp.route('/<int:id_postagem>', methods=['PUT'])
+@token_required
+def editar_postagem(id_postagem):
+    return controller.editar_postagem(id_postagem)
+
 @postagem_bp.route('/<int:id_postagem>/curtir', methods=['POST'])
 @token_required
 def curtir_postagem(id_postagem):

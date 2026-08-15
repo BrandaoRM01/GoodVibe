@@ -120,6 +120,21 @@ class PostagemDAO(BaseDAO):
             cursor.close()
             conexao.close()
 
+    def atualizar_postagem(self, id_postagem, conteudo, url_imagem, boa_acao, tags_nomes):
+        sql = "UPDATE postagens SET conteudo = %s, url_imagem = %s, boa_acao = %s WHERE id = %s"
+        valores = [conteudo, url_imagem, boa_acao, id_postagem]
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor()
+        try:
+            cursor.execute(sql, valores)
+            cursor.execute("DELETE FROM postagens_tags WHERE postagem_id = %s", (id_postagem,))
+            self.__salvar_tags_postagem(cursor, id_postagem, tags_nomes)
+            conexao.commit()
+        finally:
+            cursor.close()
+            conexao.close()
+
     def buscar_sugestoes_tags(self, termo, limite=8):
         sql = "SELECT id, nome FROM tags WHERE nome LIKE %s ORDER BY nome ASC LIMIT %s"
         conexao = self._get_connection()

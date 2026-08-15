@@ -86,3 +86,20 @@ export async function apiTagsTendencias(): Promise<TagTendenciaAPI[]> {
     const data: { tendencias: TagTendenciaAPI[] } = await request("/api/postagens/tags/tendencias");
     return data.tendencias;
 }
+
+export interface EditarPostagemPayload {
+    conteudo: string;
+    imagem?: File;
+    removerImagem?: boolean;
+    tags?: string[];
+}
+
+export async function apiEditarPostagem(id: number, payload: EditarPostagemPayload): Promise<{ mensagem: string }> {
+    const formData = new FormData();
+    formData.append("conteudo", payload.conteudo);
+    if (payload.imagem) formData.append("imagem", payload.imagem);
+    if (payload.removerImagem) formData.append("remover_imagem", "true");
+    (payload.tags ?? []).forEach((nome) => formData.append("tags", nome));
+
+    return request(`/api/postagens/${id}`, { method: "PUT", body: formData });
+}

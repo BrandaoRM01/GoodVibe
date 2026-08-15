@@ -91,6 +91,59 @@ class PostagemController:
 
         return jsonify({'mensagem': 'Postagem publicada com sucesso!'}), 201
 
+    def editar_postagem(self, id_postagem):
+        usuario_logado = request.usuario_atual
+        postagem_existente = self.__dao_postagem.buscar_por_id(id_postagem)
+
+        if not postagem_existente:
+            return jsonify({'erro': 'Postagem não encontrada.'}), 404
+
+        eh_autor = postagem_existente.autor.email == usuario_logado.get('email')
+        if not eh_autor:
+            return jsonify({'erro': 'Você não tem permissão para esta ação.'}), 403
+
+        conteudo = request.form.get('conteudo')
+        if not conteudo or not conteudo.strip():
+            return jsonify({'erro': 'Informe o conteúdo da postagem.'}), 400
+
+        imagem = request.files.get('imagem')
+        remover_imagem = request.form.get('remover_imagem') == 'true'
+        tags_nomes = self.__extrair_tags()
+        autor_email = usuario_logado.get('email')
+
+        url_imagem_antiga = postagem_existente.url_imagem
+
+        if imagem and imagem.filename != "":
+            if url_imagem_antiga:
+                nome_antigo = os.path.basename(url_imagem_antiga)
+                caminho_antigo = os.path.join(Config.UPLOAD_POSTAGEM, nome_antigo)
+                if os.path.exists(caminho_antigo):
+                    os.remove(caminho_antigo)
+
+            extensao = os.path.splitext(imagem.filename)[1]
+            nome_arquivo = secure_filename(f"post_{autor_email}_{os.urandom(4).hex()}{extensao}")
+            caminho = os.path.join(Config.UPLOAD_POSTAGEM, nome_arquivo)
+            imagem.save(caminho)
+
+            url_imagem = f"uploads/postagem/{nome_arquivo}"
+
+        elif remover_imagem:
+            if url_imagem_antiga:
+                nome_antigo = os.path.basename(url_imagem_antiga)
+                caminho_antigo = os.path.join(Config.UPLOAD_POSTAGEM, nome_antigo)
+                if os.path.exists(caminho_antigo):
+                    os.remove(caminho_antigo)
+            url_imagem = None
+
+        else:
+            url_imagem = url_imagem_antiga
+
+        self.__dao_postagem.atualizar_postagem(
+            id_postagem, conteudo.strip(), url_imagem, postagem_existente.boa_acao, tags_nomes
+        )
+
+        return jsonify({'mensagem': 'Postagem atualizada com sucesso!'}), 200
+
     def curtir_postagem(self, id_postagem):
         email_usuario = request.usuario_atual.get('email')
 

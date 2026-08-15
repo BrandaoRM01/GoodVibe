@@ -1,11 +1,14 @@
 import { Image, Smile, Sparkles, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useCriarPostagem, useSugestoesTags } from "@/lib/use-postagens";
+import { useCriarPostagem } from "@/lib/use-postagens";
 import { useUsuarioAtual } from "@/lib/use-auth";
+import { toast } from "sonner";
 import { ApiError, API_URL } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
-import EmojiPicker, { Theme, EmojiStyle } from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import pt from "emoji-picker-react/dist/data/emojis-pt";
+import { TagSearchBox } from "@/components/tag-search-box";
+import { ToolBtn } from "@/components/toolbar-button";
 
 const MAX_TAGS = 5;
 
@@ -15,7 +18,6 @@ export function Composer() {
   const [imagemPreviewUrl, setImagemPreviewUrl] = useState<string | null>(null);
   const [mostrarBuscaTag, setMostrarBuscaTag] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
-  const [erro, setErro] = useState<string | null>(null);
   const [mostrarEmojis, setMostrarEmojis] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -78,7 +80,6 @@ export function Composer() {
 
   async function handlePublicar() {
     if (!podePublicar) return;
-    setErro(null);
 
     try {
       await criarPostagem.mutateAsync({
@@ -87,13 +88,16 @@ export function Composer() {
         tags,
       });
 
+      toast.success("Postagem publicada com sucesso!");
+
       setText("");
       setImagem(null);
       setTags([]);
       setMostrarBuscaTag(false);
       if (inputImagemRef.current) inputImagemRef.current.value = "";
     } catch (e) {
-      setErro(e instanceof ApiError ? e.message : "Não foi possível publicar. Tente novamente.");
+      const msg = e instanceof ApiError ? e.message : "Não foi possível publicar. Tente novamente.";
+      toast.error(msg);
     }
   }
 
@@ -170,8 +174,6 @@ export function Composer() {
         </p>
       )}
 
-      {erro && <p className="mt-2 text-xs text-destructive">{erro}</p>}
-
       <div className="mt-3 flex items-center justify-between">
         <div className="flex items-center gap-1 text-muted-foreground">
           <input
@@ -223,136 +225,5 @@ export function Composer() {
         </button>
       </div>
     </div>
-  );
-}
-
-function TagSearchBox({
-  tagsAtuais,
-  onAdicionar,
-  disabled,
-  onFechar,
-}: {
-  tagsAtuais: string[];
-  onAdicionar: (nome: string) => void;
-  disabled?: boolean;
-  onFechar: () => void;
-}) {
-  const [termo, setTermo] = useState("");
-  const [termoDebounced, setTermoDebounced] = useState("");
-  const [aberto, setAberto] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setTermoDebounced(termo), 250);
-    return () => clearTimeout(timer);
-  }, [termo]);
-
-  const { data: sugestoes, isFetching } = useSugestoesTags(termoDebounced);
-  const sugestoesFiltradas = (sugestoes ?? []).filter(
-    (s) => !tagsAtuais.some((t) => t.toLowerCase() === s.nome.toLowerCase())
-  );
-
-  function escolher(nome: string) {
-    onAdicionar(nome);
-    setTermo("");
-    setAberto(false);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      if (sugestoesFiltradas.length > 0) {
-        escolher(sugestoesFiltradas[0].nome);
-      } else if (termo.trim()) {
-        escolher(termo);
-      }
-    } else if (e.key === "Escape") {
-      onFechar();
-    }
-  }
-
-  return (
-    <div className="mt-2 relative">
-      <div className="flex items-center gap-2">
-        <input
-          value={termo}
-          onChange={(e) => {
-            setTermo(e.target.value);
-            setAberto(true);
-          }}
-          onFocus={() => setAberto(true)}
-          onBlur={() => setTimeout(() => setAberto(false), 150)}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          placeholder="Ex: voluntariado, doação..."
-          autoFocus
-          className="flex-1 text-sm bg-primary/5 border border-primary/20 rounded-full px-4 py-1.5 outline-none placeholder:text-muted-foreground"
-        />
-        <button
-          type="button"
-          onClick={onFechar}
-          className="h-7 w-7 rounded-full grid place-items-center hover:bg-accent shrink-0"
-        >
-          <X className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
-      {aberto && termo.trim().length >= 2 && (
-        <div className="absolute z-10 mt-1 w-full bg-card border border-border rounded-xl shadow-soft overflow-hidden">
-          {isFetching && <p className="px-3 py-2 text-xs text-muted-foreground">Buscando...</p>}
-
-          {!isFetching && sugestoesFiltradas.length > 0 && (
-            <ul>
-              {sugestoesFiltradas.map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => escolher(s.nome)}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors"
-                  >
-                    #{s.nome}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!isFetching && sugestoesFiltradas.length === 0 && (
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => escolher(termo)}
-              className="w-full text-left px-3 py-2 text-sm text-muted-foreground hover:bg-accent transition-colors"
-            >
-              Criar tag "#{termo.trim()}"
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ToolBtn({
-  icon,
-  label,
-  active,
-  onClick,
-}: {
-  icon: React.ReactNode;
-  label?: string;
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-full hover:bg-primary/10 hover:text-primary transition-colors ${active ? "bg-primary/10 text-primary" : ""
-        }`}
-    >
-      {icon}
-      {label && <span>{label}</span>}
-    </button>
   );
 }
