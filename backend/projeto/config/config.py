@@ -13,8 +13,11 @@ class Config:
     # Caminhos para upload
     BASE_DIR = Path(__file__).resolve().parent.parent
 
-    UPLOAD_USER = os.path.join(BASE_DIR, 'static', 'uploads', 'user')
-    UPLOAD_PONTOS = os.path.join(BASE_DIR, 'static', 'uploads', 'pontos')
+    UPLOAD_USER = os.path.join(BASE_DIR, 'uploads', 'user')
+    UPLOAD_POSTAGEM = os.path.join(BASE_DIR, 'uploads', 'postagem')
+
+    os.makedirs(UPLOAD_USER, exist_ok=True)
+    os.makedirs(UPLOAD_POSTAGEM, exist_ok=True)
 
     # Configurações MYSQL
     MYSQL_HOST = os.getenv('MYSQL_HOST')

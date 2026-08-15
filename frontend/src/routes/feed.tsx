@@ -6,41 +6,78 @@ import { Composer } from "@/components/Composer";
 import { PostCard, type Post } from "@/components/PostCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Search, Bell } from "lucide-react";
+import { useFeed } from "@/lib/use-postagens";
+import type { PostagemAPI } from "@/lib/postagens";
+import { API_URL } from "@/lib/api";
+import { X } from "lucide-react";
+
+interface FeedSearch {
+  tag?: string;
+  autor?: string;
+}
 
 export const Route = createFileRoute("/feed")({
   head: () => ({ meta: [{ title: "Feed — GoodVib&" }] }),
+  validateSearch: (search: Record<string, unknown>): FeedSearch => ({
+    tag: typeof search.tag === "string" ? search.tag : undefined,
+    autor: typeof search.autor === "string" ? search.autor : undefined,
+  }),
   component: FeedPage,
 });
 
-const posts: Post[] = [
-  {
-    id: "1", author: "Marina Costa", handle: "@marina", avatar: "M", time: "agora",
-    content: "Hoje passei a manhã ajudando no abrigo de animais do bairro. Ver os olhinhos felizes me lembrou que pequenos gestos importam muito 🐾",
-    image: "Foto: voluntariado no abrigo",
-    tags: ["#GentilezaUrbana", "#Animais", "#Voluntariado"],
-    likes: 284, comments: 42, shares: 12, goodDeed: "Voluntariado",
-  },
-  {
-    id: "2", author: "Lucas Andrade", handle: "@lucas.a", avatar: "L", time: "2h",
-    content: "Comprei o café e paguei o do próximo da fila. A reação dele fez meu dia ✨ Tente, é mais leve do que parece.",
-    tags: ["#PayItForward", "#VibesPositivas"],
-    likes: 156, comments: 23, shares: 8, goodDeed: "Café suspenso",
-  },
-  {
-    id: "3", author: "Sofia Oliveira", handle: "@sofiaoli", avatar: "S", time: "4h",
-    content: "Lembrete diário: você é mais gentil do que imagina. Continue 🌸",
-    tags: ["#BemEstar", "#Autocuidado"],
-    likes: 512, comments: 89, shares: 34,
-  },
-  {
-    id: "4", author: "Rafael Mendes", handle: "@rafa.m", avatar: "R", time: "ontem",
-    content: "Iniciamos uma horta comunitária no prédio. Quem quiser participar, comenta aí que mando os detalhes 🌱",
-    tags: ["#Comunidade", "#Sustentabilidade"],
-    likes: 198, comments: 56, shares: 21, goodDeed: "Iniciativa local",
-  },
-];
+function formatarData(dataStr: string | null): string {
+  if (!dataStr) return "";
+
+  const normalizado = dataStr.includes("T") ? dataStr : dataStr.replace(" ", "T");
+  const data = new Date(normalizado);
+  if (isNaN(data.getTime())) return dataStr;
+
+  const agora = new Date();
+  const diffMs = agora.getTime() - data.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHoras = Math.floor(diffMin / 60);
+  const diffDias = Math.floor(diffHoras / 24);
+
+  if (diffMin < 1) return "agora";
+  if (diffMin < 60) return `há ${diffMin}min`;
+  if (diffHoras < 24) return `há ${diffHoras}h`;
+  if (diffDias === 1) return "ontem";
+  if (diffDias < 7) return `há ${diffDias}d`;
+
+  return data.toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function mapearPostagem(p: PostagemAPI): Post {
+  return {
+    id: String(p.id),
+    author: p.author,
+    handle: p.handle,
+    avatar: p.author?.charAt(0)?.toUpperCase() ?? "?",
+    avatarFotoUrl: p.avatarUrl ? `${API_URL}/${p.avatarUrl}` : undefined,
+    time: formatarData(p.time),
+    content: p.content,
+    image: p.image ? `${API_URL}/${p.image}` : undefined,
+    tags: p.tags,
+    likes: p.likes,
+    comments: p.comments,
+    shares: p.shares,
+    liked: p.curtidoPorMim,
+  };
+}
 
 function FeedPage() {
+  const { tag, autor } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const { data: postagens, isLoading, isError, error } = useFeed(tag, autor);
+
+  function limparTag() {
+    navigate({ search: (prev) => ({ ...prev, tag: undefined }) });
+  }
+
+  function limparAutor() {
+    navigate({ search: (prev) => ({ ...prev, autor: undefined }) });
+  }
+
   return (
     <div className="min-h-screen flex">
       <AppSidebar />
@@ -59,11 +96,54 @@ function FeedPage() {
 
         <div className="space-y-4">
           <Composer />
-          {posts.map((p, i) => <PostCard key={p.id} post={p} index={i} />)}
+
+          {(tag || autor) && (
+            <div className="flex flex-wrap items-center gap-2 px-1">
+              {autor && <FiltroChip label={`@${autor}`} onRemover={limparAutor} />}
+              {tag && <FiltroChip label={`#${tag}`} onRemover={limparTag} />}
+            </div>
+          )}
+
+          {isLoading && (
+            <p className="text-center text-sm text-muted-foreground py-8">Carregando feed...</p>
+          )}
+
+          {isError && (
+            <p className="text-center text-sm text-destructive py-8">
+              Não foi possível carregar o feed{error instanceof Error ? `: ${error.message}` : "."}
+            </p>
+          )}
+
+          {!isLoading && !isError && postagens?.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground py-8">
+              {tag || autor
+                ? "Nenhuma postagem encontrada com esse filtro."
+                : "Ainda não há postagens por aqui. Seja o primeiro a compartilhar algo bom!"}
+            </p>
+          )}
+
+          {postagens?.map((p, i) => (
+            <PostCard key={p.id} post={mapearPostagem(p)} index={i} />
+          ))}
         </div>
       </main>
       <MobileNav />
       <RightRail />
     </div>
+  );
+}
+
+function FiltroChip({ label, onRemover }: { label: string; onRemover: () => void }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary bg-primary/10 pl-3 pr-1.5 py-1 rounded-full">
+      {label}
+      <button
+        type="button"
+        onClick={onRemover}
+        className="h-4 w-4 rounded-full grid place-items-center hover:bg-primary/20 transition-colors"
+      >
+        <X className="h-3 w-3" />
+      </button>
+    </span>
   );
 }

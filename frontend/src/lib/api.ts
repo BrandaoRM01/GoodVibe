@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
 const TOKEN_KEY = "goodvibe_token";
 
@@ -23,7 +23,7 @@ export class ApiError extends Error {
     }
 }
 
-async function request(path: string, options: RequestInit = {}) {
+export async function request(path: string, options: RequestInit = {}) {
     const token = getToken();
 
     const headers: Record<string, string> = {

@@ -50,3 +50,8 @@ def excluir_usuario(email):
 @gerenciador_required
 def alterar_permissao(email):
     return controller.alterar_permissao(email)
+
+@user_bp.route('/destaque', methods=['GET'])
+@token_required
+def usuarios_destaque():
+    return controller.usuarios_destaque()

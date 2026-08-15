@@ -21,9 +21,8 @@ export function MobileNav() {
             <li key={it.label + i}>
               <Link
                 to={it.to}
-                className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-colors ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
+                className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-colors ${isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
               >
                 {isActive && (
                   <motion.span

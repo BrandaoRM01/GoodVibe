@@ -15,3 +15,4 @@ class BaseDAO:
         return mysql.connector.connect(**self.__db_config)
     
 from .userDAO import UserDAO
+from .postagemDAO import PostagemDAO

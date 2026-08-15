@@ -36,11 +36,10 @@ export function AppSidebar() {
               key={it.label + i}
               to={it.to}
               title={it.label}
-              className={`group relative flex items-center gap-3 px-3 lg:px-4 py-3 rounded-2xl transition-all justify-center lg:justify-start ${
-                isActive
+              className={`group relative flex items-center gap-3 px-3 lg:px-4 py-3 rounded-2xl transition-all justify-center lg:justify-start ${isActive
                   ? "bg-primary/10 text-primary font-semibold"
                   : "text-foreground/70 hover:text-foreground hover:bg-accent"
-              }`}
+                }`}
             >
               {isActive && (
                 <motion.span

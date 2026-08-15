@@ -24,7 +24,7 @@ coverage/
 *.local
 .env
 .env.*
-!.env.example
+!.env.exemplo
 
 # Vite
 vite.config.timestamp-*

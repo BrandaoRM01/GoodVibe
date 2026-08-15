@@ -247,3 +247,8 @@ class UserController:
             'token': novo_token,
             'usuario': usuario_atualizado.to_dict()
         }), 200
+
+    def usuarios_destaque(self):
+        limite = request.args.get('limite', default=3, type=int)
+        destaques = self.__dao_usuario.buscar_usuarios_destaque(limite)
+        return jsonify({'destaques': destaques}), 200

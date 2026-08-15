@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email VARCHAR(150) PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     senha_hash VARCHAR(255) NOT NULL,
-    url_foto VARCHAR(500) DEFAULT 'img/default/user_foto.webp',
+    url_foto VARCHAR(500) DEFAULT NULL,
     tipo_usuario ENUM('user', 'admin', 'superadmin') DEFAULT 'user' NOT NULL,
     token_recuperacao VARCHAR(255) NULL,
     token_expiracao DATETIME NULL
@@ -21,3 +21,61 @@ CREATE TABLE IF NOT EXISTS historico_senhas (
     FOREIGN KEY (usuario_email) REFERENCES usuarios(email) 
     ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS postagens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    conteudo TEXT NOT NULL,
+    url_imagem VARCHAR(500) DEFAULT NULL,
+    boa_acao VARCHAR(100) DEFAULT NULL,
+    total_curtidas INT NOT NULL DEFAULT 0,
+    total_comentarios INT NOT NULL DEFAULT 0,
+    total_compartilhamentos INT NOT NULL DEFAULT 0,
+    status ENUM('rejeitado', 'pendente', 'aprovado') NOT NULL DEFAULT 'aprovado',
+    autor_email VARCHAR(150) NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (autor_email) REFERENCES usuarios(email)
+    ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS tags (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS postagens_tags (
+    postagem_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY (postagem_id, tag_id),
+    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS curtidas (
+    postagem_id INT NOT NULL,
+    usuario_email VARCHAR(150) NOT NULL,
+    PRIMARY KEY (postagem_id, usuario_email),
+    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_email) REFERENCES usuarios(email) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE OR REPLACE VIEW vw_postagens AS
+SELECT
+    p.id, p.conteudo, p.url_imagem, p.boa_acao,
+    p.total_curtidas, p.total_comentarios, p.total_compartilhamentos,
+    p.status, p.criado_em, p.autor_email,
+
+    u.username AS autor_username,
+    u.url_foto AS autor_url_foto,
+    u.tipo_usuario AS autor_tipo_usuario,
+
+    t.id AS tag_id,
+    t.nome AS tag_nome,
+
+    c.usuario_email AS curtida_usuario_email
+
+FROM postagens p
+    INNER JOIN usuarios u ON p.autor_email = u.email
+    LEFT JOIN postagens_tags pt ON pt.postagem_id = p.id
+    LEFT JOIN tags t ON pt.tag_id = t.id
+    LEFT JOIN curtidas c ON c.postagem_id = p.id;

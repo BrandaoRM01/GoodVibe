@@ -294,3 +294,22 @@ class UserDAO(BaseDAO):
         finally:
             cursor.close()
             conexao.close()
+
+    def buscar_usuarios_destaque(self, limite=3):
+        sql = """
+            SELECT u.email, u.username, u.url_foto, COUNT(p.id) AS totalPostagens
+            FROM usuarios u
+            INNER JOIN postagens p ON p.autor_email = u.email
+            WHERE p.status = 'aprovado'
+            GROUP BY u.email, u.username, u.url_foto
+            ORDER BY totalPostagens DESC
+            LIMIT %s
+        """
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+        try:
+            cursor.execute(sql, [limite])
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+            conexao.close()
