@@ -9,7 +9,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     url_foto VARCHAR(500) DEFAULT NULL,
     tipo_usuario ENUM('user', 'admin', 'superadmin') DEFAULT 'user' NOT NULL,
     token_recuperacao VARCHAR(255) NULL,
-    token_expiracao DATETIME NULL
+    token_expiracao DATETIME NULL,
+    qtd_seguidores INT UNSIGNED NOT NULL DEFAULT 0,
+    qtd_seguindo INT UNSIGNED NOT NULL DEFAULT 0,
+    qtd_conquistas INT UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS historico_senhas (

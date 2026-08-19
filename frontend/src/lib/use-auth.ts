@@ -20,8 +20,8 @@ export function useLogin() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ email, senha }: { email: string; senha: string }) => apiLogin(email, senha),
-        onSuccess: (usuario) => {
-            queryClient.setQueryData(["usuario-atual"], usuario);
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["usuario-atual"] });
         },
     });
 }

@@ -55,6 +55,10 @@ export type Usuario = {
     tipo_usuario: string;
     pode_moderar: boolean;
     pode_gerenciar_usuarios: boolean;
+    qtd_seguidores: number;
+    qtd_seguindo: number;
+    qtd_conquistas: number;
+    qtd_postagens: number;
 };
 
 export async function apiLogin(email: string, senha: string): Promise<Usuario> {

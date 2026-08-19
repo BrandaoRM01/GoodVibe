@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from projeto.dao import UserDAO
+from projeto.dao import UserDAO, PostagemDAO
 from projeto.factorys import UsuarioFactory
 from projeto.config import Config
 from projeto.utils import gerar_token
@@ -11,6 +11,7 @@ import os
 class UserController:
     def __init__(self):
         self.__dao_usuario = UserDAO()
+        self.__postagem_dao = PostagemDAO()
 
     def __validar_email(self, email):
         try:
@@ -26,7 +27,9 @@ class UserController:
         return True
 
     def me(self):
-        return jsonify({'usuario': request.usuario_atual}), 200
+        usuario = dict(request.usuario_atual)
+        usuario['qtd_postagens'] = self.__postagem_dao.contar_postagens_por_autor(usuario['email'])
+        return jsonify({'usuario': usuario}), 200
 
     def listar_usuarios(self):
         usuarios = self.__dao_usuario.listar_usuarios()

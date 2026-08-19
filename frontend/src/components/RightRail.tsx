@@ -1,4 +1,4 @@
-import { Flame, Trophy, TrendingUp, Heart } from "lucide-react";
+import { Flame, TrendingUp, Heart } from "lucide-react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTagsTendencias } from "@/lib/use-postagens";
 import { useUsuariosDestaque } from "@/lib/use-usuarios";
@@ -104,20 +104,6 @@ export function RightRail() {
         </div>
       </Card>
 
-      <Card title="Sua conquista" icon={<Trophy className="h-4 w-4" />}>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold">Nível 7 · Empático</span>
-            <span className="text-muted-foreground">2.140 / 3.000 XP</span>
-          </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div className="h-full gradient-primary rounded-full" style={{ width: "71%" }} />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Complete 3 boas ações para desbloquear o emblema "Coração de Ouro" 💛
-          </p>
-        </div>
-      </Card>
     </aside>
   );
 }

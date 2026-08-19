@@ -135,6 +135,25 @@ class PostagemDAO(BaseDAO):
             cursor.close()
             conexao.close()
 
+    def contar_postagens_por_autor(self, autor_email):
+        sql = """
+            SELECT COUNT(*) AS total
+            FROM postagens
+            WHERE autor_email = %s
+        """
+        valor = [autor_email]
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute(sql, valor)
+            resultado = cursor.fetchone()
+            return resultado['total'] if resultado else 0
+        finally:
+            cursor.close()
+            conexao.close()
+
     def buscar_sugestoes_tags(self, termo, limite=8):
         sql = "SELECT id, nome FROM tags WHERE nome LIKE %s ORDER BY nome ASC LIMIT %s"
         conexao = self._get_connection()

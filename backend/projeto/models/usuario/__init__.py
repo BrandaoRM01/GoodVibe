@@ -2,13 +2,16 @@ from abc import ABC, abstractmethod
 
 class Usuario(ABC):
 
-    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None):
+    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None, qtd_seguidores=0, qtd_seguindo=0, qtd_conquistas=0):
         self.__email = email
         self.__senha_hash = senha_hash
         self.__url_foto = url_foto
         self.__username = username
         self.__token_recuperacao = token_recuperacao
         self.__token_expiracao = token_expiracao
+        self.__qtd_seguidores = qtd_seguidores
+        self.__qtd_seguindo = qtd_seguindo
+        self.__qtd_conquistas = qtd_conquistas
 
     @property
     def email(self):
@@ -33,6 +36,18 @@ class Usuario(ABC):
     @property
     def token_expiracao(self):
         return self.__token_expiracao
+
+    @property
+    def qtd_seguidores(self):
+        return self.__qtd_seguidores
+
+    @property
+    def qtd_seguindo(self):
+        return self.__qtd_seguindo
+
+    @property
+    def qtd_conquistas(self):
+        return self.__qtd_conquistas
     
     @email.setter
     def email(self, valor):
@@ -57,6 +72,18 @@ class Usuario(ABC):
     @token_expiracao.setter
     def token_expiracao(self, valor):
         self.__token_expiracao = valor
+
+    @qtd_seguidores.setter
+    def qtd_seguidores(self, valor):
+        self.__qtd_seguidores = valor
+
+    @qtd_seguindo.setter
+    def qtd_seguindo(self, valor):
+        self.__qtd_seguindo = valor
+
+    @qtd_conquistas.setter
+    def qtd_conquistas(self, valor):
+        self.__qtd_conquistas = valor
 
     @abstractmethod
     def to_dict(self):

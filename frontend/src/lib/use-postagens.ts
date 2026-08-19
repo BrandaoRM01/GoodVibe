@@ -25,11 +25,12 @@ export function useSugestoesTags(termo: string) {
   });
 }
 
-export function useFeed(tag?: string, autor?: string) {
+export function useFeed(tag?: string, autor?: string, options?: { enabled?: boolean }) {
   return useQuery<PostagemAPI[]>({
     queryKey: ["feed", tag ?? null, autor ?? null],
     queryFn: () => apiListarFeed(tag, autor),
     staleTime: 60 * 1000,
+    enabled: options?.enabled ?? true,
   });
 }
 
@@ -55,7 +56,6 @@ export function useCurtirPostagem() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: number) => apiCurtirPostagem(id),
-    // otimista: já marca como curtida na UI antes da resposta do servidor
     onMutate: async (id: number) => {
       await queryClient.cancelQueries({ queryKey: ["feed"] });
       const anterior = queryClient.getQueryData<PostagemAPI[]>(["feed"]);
