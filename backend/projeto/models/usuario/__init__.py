@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class Usuario(ABC):
 
-    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None, qtd_seguidores=0, qtd_seguindo=0, qtd_conquistas=0):
+    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None, qtd_seguidores=0, qtd_seguindo=0, descricao_perfil=None, data_entrada=None, url_capa=None, localizacao=None):
         self.__email = email
         self.__senha_hash = senha_hash
         self.__url_foto = url_foto
@@ -11,7 +11,10 @@ class Usuario(ABC):
         self.__token_expiracao = token_expiracao
         self.__qtd_seguidores = qtd_seguidores
         self.__qtd_seguindo = qtd_seguindo
-        self.__qtd_conquistas = qtd_conquistas
+        self.__descricao_perfil = descricao_perfil
+        self.__data_entrada = data_entrada
+        self.__localizacao = localizacao
+        self.__url_capa = url_capa
 
     @property
     def email(self):
@@ -46,9 +49,25 @@ class Usuario(ABC):
         return self.__qtd_seguindo
 
     @property
-    def qtd_conquistas(self):
-        return self.__qtd_conquistas
-    
+    def descricao_perfil(self):
+        return self.__descricao_perfil
+
+    @property
+    def data_entrada(self):
+        return self.__data_entrada
+
+    @property
+    def url_capa(self):
+        return self.__url_capa
+
+    @property
+    def localizacao(self):
+        return self.__localizacao
+
+    @localizacao.setter
+    def localizacao(self, valor):
+        self.__localizacao = valor
+
     @email.setter
     def email(self, valor):
         self.__email = valor
@@ -81,9 +100,17 @@ class Usuario(ABC):
     def qtd_seguindo(self, valor):
         self.__qtd_seguindo = valor
 
-    @qtd_conquistas.setter
-    def qtd_conquistas(self, valor):
-        self.__qtd_conquistas = valor
+    @descricao_perfil.setter
+    def descricao_perfil(self, valor):
+        self.__descricao_perfil = valor
+
+    @data_entrada.setter
+    def data_entrada(self, valor):
+        self.__data_entrada = valor
+
+    @url_capa.setter
+    def url_capa(self, valor):
+        self.__url_capa = valor
 
     @abstractmethod
     def to_dict(self):

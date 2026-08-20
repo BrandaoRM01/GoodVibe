@@ -12,7 +12,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     token_expiracao DATETIME NULL,
     qtd_seguidores INT UNSIGNED NOT NULL DEFAULT 0,
     qtd_seguindo INT UNSIGNED NOT NULL DEFAULT 0,
-    qtd_conquistas INT UNSIGNED NOT NULL DEFAULT 0
+    descricao_perfil VARCHAR(500) DEFAULT NULL,
+    data_entrada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    url_capa VARCHAR(500) DEFAULT NULL,
+    localizacao VARCHAR(150) DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS historico_senhas (

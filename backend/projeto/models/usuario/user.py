@@ -2,10 +2,8 @@ from . import Usuario
 
 class User(Usuario):
 
-    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None,
-                 qtd_seguidores=0, qtd_seguindo=0, qtd_conquistas=0):
-       super().__init__(email, username, senha_hash, url_foto, token_recuperacao, token_expiracao,
-                         qtd_seguidores, qtd_seguindo, qtd_conquistas)
+    def __init__(self, email, username, senha_hash=None, url_foto=None, token_recuperacao=None, token_expiracao=None, qtd_seguidores=0, qtd_seguindo=0, descricao_perfil=None, data_entrada=None, url_capa=None, localizacao=None):
+       super().__init__(email, username, senha_hash, url_foto, token_recuperacao, token_expiracao, qtd_seguidores, qtd_seguindo, descricao_perfil, data_entrada, url_capa, localizacao)
 
     def tipo_usuario(self):
         return 'user'
@@ -29,5 +27,8 @@ class User(Usuario):
             'pode_gerenciar_usuarios': self.pode_gerenciar_usuarios(),
             'qtd_seguidores': self.qtd_seguidores,
             'qtd_seguindo': self.qtd_seguindo,
-            'qtd_conquistas': self.qtd_conquistas
+            'descricao_perfil': self.descricao_perfil,
+            'data_entrada': self.data_entrada.isoformat() if self.data_entrada else None    ,
+            'url_capa': self.url_capa,
+            'localizacao': self.localizacao
         }

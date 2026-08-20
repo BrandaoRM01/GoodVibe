@@ -23,6 +23,10 @@ export function RightRail() {
     navigate({ to: "/feed", search: (prev: Record<string, unknown>) => ({ ...prev, autor: username }) });
   }
 
+  function abrirPerfil(email: string) {
+    navigate({ to: "/profile/$email", params: { email } });
+  }
+
   return (
     <aside className="hidden xl:flex sticky top-0 h-screen w-80 shrink-0 flex-col gap-5 px-4 py-6 overflow-y-auto scrollbar-thin">
       <Card title="Tendências positivas" icon={<TrendingUp className="h-4 w-4" />}>
@@ -74,13 +78,17 @@ export function RightRail() {
 
             return (
               <div key={u.email} className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold shrink-0 overflow-hidden cursor-default">
+                <button
+                  type="button"
+                  onClick={() => abrirPerfil(u.email)}
+                  className="h-10 w-10 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+                >
                   {avatarFotoUrl ? (
                     <img src={avatarFotoUrl} alt="" className="w-full h-full object-cover" />
                   ) : (
                     avatarLetra
                   )}
-                </div>
+                </button>
 
                 <button
                   type="button"

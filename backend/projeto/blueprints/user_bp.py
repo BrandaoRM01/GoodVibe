@@ -33,6 +33,11 @@ def editar_perfil():
 def apagar_perfil(email):
     return controller.apagar_perfil(email)
 
+@user_bp.route('/perfil/<email>', methods=['GET'])
+@token_required
+def buscar_perfil_publico(email):
+    return controller.buscar_perfil_publico(email)
+
 @user_bp.route('/admin/usuarios', methods=['GET'])
 @token_required
 @gerenciador_required
@@ -55,3 +60,8 @@ def alterar_permissao(email):
 @token_required
 def usuarios_destaque():
     return controller.usuarios_destaque()
+
+@user_bp.route('/alterar-senha', methods=['POST'])
+@token_required
+def alterar_senha():
+    return controller.alterar_senha()

@@ -146,14 +146,17 @@ class UserDAO(BaseDAO):
             resultado = self.__pegar_foto_usuario(email)
 
             if resultado:
-                url_foto = resultado['url_foto']
-
-                if url_foto != "img/default/user_foto.webp":
-
-                    caminho_foto = os.path.join(Config.BASE_DIR, "static", url_foto)
-
+                url_foto = resultado.get('url_foto')
+                if url_foto and "default" not in url_foto:
+                    caminho_foto = os.path.join(Config.BASE_DIR, url_foto)
                     if os.path.exists(caminho_foto):
                         os.remove(caminho_foto)
+
+                url_capa = resultado.get('url_capa')
+                if url_capa:
+                    caminho_capa = os.path.join(Config.BASE_DIR, url_capa)
+                    if os.path.exists(caminho_capa):
+                        os.remove(caminho_capa)
 
             cursor.execute(sql, valor)
             conexao.commit()
@@ -210,13 +213,19 @@ class UserDAO(BaseDAO):
             SET 
                 username = %s,
                 senha_hash = %s,
-                url_foto = %s
+                url_foto = %s,
+                descricao_perfil = %s,
+                url_capa = %s,
+                localizacao = %s
             WHERE email = %s
         '''
         valores = [
             usuario_atualizado.username,
             usuario_atualizado.senha_hash,
             usuario_atualizado.url_foto,
+            usuario_atualizado.descricao_perfil,
+            usuario_atualizado.url_capa,
+            usuario_atualizado.localizacao,
             usuario_atualizado.email
         ]
 

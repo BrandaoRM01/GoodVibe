@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
   Home, Compass, MessageCircle, Bell, User, Settings, Sparkles, Heart, ShieldCheck,
 } from "lucide-react";
@@ -15,6 +15,7 @@ const items = [
 
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
 
   return (
     <aside className="hidden md:flex sticky top-0 h-screen w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-6">
@@ -37,8 +38,8 @@ export function AppSidebar() {
               to={it.to}
               title={it.label}
               className={`group relative flex items-center gap-3 px-3 lg:px-4 py-3 rounded-2xl transition-all justify-center lg:justify-start ${isActive
-                  ? "bg-primary/10 text-primary font-semibold"
-                  : "text-foreground/70 hover:text-foreground hover:bg-accent"
+                ? "bg-primary/10 text-primary font-semibold"
+                : "text-foreground/70 hover:text-foreground hover:bg-accent"
                 }`}
             >
               {isActive && (
@@ -58,7 +59,10 @@ export function AppSidebar() {
       <div className="hidden lg:block mt-auto rounded-3xl p-5 gradient-primary text-primary-foreground shadow-glow">
         <Heart className="h-5 w-5 mb-2" />
         <p className="text-sm font-semibold leading-snug mb-3">Espalhe boas vibrações hoje</p>
-        <button className="w-full bg-white/20 hover:bg-white/30 transition-colors text-xs font-medium rounded-full py-2">
+        <button
+          onClick={() => navigate({ to: "/feed", search: { compose: true } })}
+          className="w-full bg-white/20 hover:bg-white/30 transition-colors text-xs font-medium rounded-full py-2"
+        >
           Compartilhar boa ação
         </button>
       </div>

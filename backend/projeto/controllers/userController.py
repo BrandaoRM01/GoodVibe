@@ -1,17 +1,20 @@
 from flask import jsonify, request
-from projeto.dao import UserDAO, PostagemDAO
+from projeto.dao import UserDAO, PostagemDAO, HistoricoSenhaDAO
+from projeto.models import HistoricoSenha
 from projeto.factorys import UsuarioFactory
 from projeto.config import Config
 from projeto.utils import gerar_token
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from email_validator import validate_email, EmailNotValidError
+import time
 import os
 
 class UserController:
     def __init__(self):
         self.__dao_usuario = UserDAO()
         self.__postagem_dao = PostagemDAO()
+        self.__dao_historico_senha = HistoricoSenhaDAO()
 
     def __validar_email(self, email):
         try:
@@ -92,6 +95,9 @@ class UserController:
 
         self.__dao_usuario.cadastrar_usuario(novo_usuario)
 
+        historico = HistoricoSenha(novo_usuario, senha_hash)
+        self.__dao_historico_senha.inserir_nova_senha(historico)
+
         return jsonify({'mensagem': 'Cadastro realizado com sucesso! Faça login para acessar sua conta.'}), 201
 
     def autenticar_usuario(self):
@@ -156,9 +162,10 @@ class UserController:
     def editar_perfil(self):
         email = request.usuario_atual.get('email')
         username = request.form.get('username')
-        senha = request.form.get('senha')
-        confirmar_senha = request.form.get('confirmar_senha')
+        descricao_perfil = request.form.get('descricao_perfil')
+        localizacao = request.form.get('localizacao')
         foto = request.files.get('foto')
+        capa = request.files.get('capa')
 
         usuario = self.__dao_usuario.buscar_usuario_por_email(email)
         lista_usernames = self.__dao_usuario.pegar_usernames()
@@ -175,20 +182,6 @@ class UserController:
             return jsonify({'erro': 'Username já está em uso por outro usuário. Tente outro nome.'}), 409
 
         senha_hash = usuario.senha_hash
-
-        if senha and confirmar_senha:
-            if senha != confirmar_senha:
-                return jsonify({'erro': 'As senhas não coincidem.'}), 400
-
-            senha_hash_nova = generate_password_hash(senha)
-
-            if not self.__verificar_senha(usuario, senha, senha_hash_nova):
-                return jsonify({'erro': 'Não foi possível validar a nova senha.'}), 400
-
-            senha_hash = senha_hash_nova
-
-        if senha and not confirmar_senha:
-            return jsonify({'erro': 'Se você quer mudar sua senha, informe também a confirmação de senha.'}), 400
 
         username_antigo = usuario.username
         nome_antigo = os.path.basename(usuario.url_foto)
@@ -217,8 +210,9 @@ class UserController:
         else:
             extensao = os.path.splitext(foto.filename)[1]
             nome_ajustado_file = secure_filename(username_ajustado.lower().replace(" ", "_"))
+            versao = int(time.time())
 
-            novo_nome = f"{nome_ajustado_file}{extensao}"
+            novo_nome = f"{nome_ajustado_file}_{versao}{extensao}"
             caminho = os.path.join(Config.UPLOAD_USER, novo_nome)
 
             if "default" not in usuario.url_foto:
@@ -231,6 +225,29 @@ class UserController:
 
             nome_arquivo = f"uploads/user/{novo_nome}"
 
+        if not capa or capa.filename == "":
+            url_capa = usuario.url_capa
+        else:
+            extensao_capa = os.path.splitext(capa.filename)[1]
+            nome_ajustado_capa = secure_filename(username_ajustado.lower().replace(" ", "_"))
+            versao_capa = int(time.time())
+
+            novo_nome_capa = f"{nome_ajustado_capa}_{versao_capa}{extensao_capa}"
+            caminho_capa = os.path.join(Config.UPLOAD_CARD, novo_nome_capa)
+
+            if usuario.url_capa:
+                caminho_antigo_capa = os.path.join(Config.UPLOAD_CARD, os.path.basename(usuario.url_capa))
+                if os.path.exists(caminho_antigo_capa):
+                    os.remove(caminho_antigo_capa)
+
+            capa.stream.seek(0)
+            capa.save(caminho_capa)
+
+            url_capa = f"uploads/card/{novo_nome_capa}"
+
+        descricao_perfil_final = usuario.descricao_perfil if descricao_perfil is None else (descricao_perfil.strip() or None)
+        localizacao_final = usuario.localizacao if localizacao is None else (localizacao.strip() or None)
+
         tipo_usuario = request.usuario_atual.get('tipo_usuario')
 
         usuario_atualizado = UsuarioFactory.criar_usuario(
@@ -238,20 +255,106 @@ class UserController:
             senha_hash=senha_hash,
             url_foto=nome_arquivo,
             username=username_ajustado,
-            tipo_usuario=tipo_usuario
+            tipo_usuario=tipo_usuario,
+            qtd_seguidores=usuario.qtd_seguidores,
+            qtd_seguindo=usuario.qtd_seguindo,
+            descricao_perfil=descricao_perfil_final,
+            data_entrada=usuario.data_entrada,
+            url_capa=url_capa,
+            localizacao=localizacao_final
         )
 
         self.__dao_usuario.editar_usuario(usuario_atualizado)
 
         novo_token = gerar_token(usuario_atualizado.to_dict())
 
+        usuario_dict = usuario_atualizado.to_dict()
+        usuario_dict['qtd_postagens'] = self.__postagem_dao.contar_postagens_por_autor(email)
+
         return jsonify({
             'mensagem': 'Usuário atualizado com sucesso!',
             'token': novo_token,
-            'usuario': usuario_atualizado.to_dict()
+            'usuario': usuario_dict
         }), 200
 
     def usuarios_destaque(self):
         limite = request.args.get('limite', default=3, type=int)
         destaques = self.__dao_usuario.buscar_usuarios_destaque(limite)
         return jsonify({'destaques': destaques}), 200
+
+    def alterar_senha(self):
+        email = request.usuario_atual.get('email')
+        senha_atual = request.form.get('senha_atual')
+        senha_nova = request.form.get('senha_nova')
+        confirmar_senha_nova = request.form.get('confirmar_senha_nova')
+
+        if not senha_atual or not senha_nova or not confirmar_senha_nova:
+            return jsonify({'erro': 'Informe todos os campos obrigatórios.'}), 400
+
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
+
+        if not usuario:
+            return jsonify({'erro': 'Usuário não encontrado no sistema.'}), 404
+
+        if not check_password_hash(usuario.senha_hash, senha_atual):
+            return jsonify({'erro': 'Senha atual incorreta.'}), 401
+
+        if senha_nova != confirmar_senha_nova:
+            return jsonify({'erro': 'As senhas não coincidem.'}), 400
+
+        if len(senha_nova) < 8:
+            return jsonify({'erro': 'A senha deve ter pelo menos 8 caracteres.'}), 400
+
+        if senha_nova == senha_atual:
+            return jsonify({'erro': 'A nova senha não pode ser igual à senha atual.'}), 400
+
+        senhas_antigas = self.__dao_historico_senha.listar_senhas_usuario(email)
+
+        for hash_antigo in senhas_antigas:
+            if check_password_hash(hash_antigo, senha_nova):
+                return jsonify({'erro': 'Você não pode reutilizar uma das suas últimas cinco senhas.'}), 400
+
+        if len(senhas_antigas) >= 5:
+            self.__dao_historico_senha.remover_senha_antiga(email)
+
+        senha_hash_nova = generate_password_hash(senha_nova)
+
+        usuario_atualizado = UsuarioFactory.criar_usuario(
+            email=usuario.email,
+            senha_hash=senha_hash_nova,
+            url_foto=usuario.url_foto,
+            username=usuario.username,
+            tipo_usuario=request.usuario_atual.get('tipo_usuario'),
+            qtd_seguidores=usuario.qtd_seguidores,
+            qtd_seguindo=usuario.qtd_seguindo,
+            descricao_perfil=usuario.descricao_perfil,
+            data_entrada=usuario.data_entrada,
+            url_capa=usuario.url_capa,
+            localizacao=usuario.localizacao
+        )
+
+        self.__dao_usuario.editar_usuario(usuario_atualizado)
+
+        historico = HistoricoSenha(usuario_atualizado, senha_hash_nova)
+        self.__dao_historico_senha.inserir_nova_senha(historico)
+
+        novo_token = gerar_token(usuario_atualizado.to_dict())
+
+        return jsonify({
+            'mensagem': 'Senha alterada com sucesso!',
+            'token': novo_token
+        }), 200
+
+    def buscar_perfil_publico(self, email):
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
+
+        if not usuario:
+            return jsonify({'erro': 'Usuário não encontrado.'}), 404
+
+        usuario_dict = usuario.to_dict()
+        usuario_dict.pop('senha_hash', None)
+        usuario_dict.pop('token_recuperacao', None)
+        usuario_dict.pop('token_expiracao', None)
+        usuario_dict['qtd_postagens'] = self.__postagem_dao.contar_postagens_por_autor(email)
+
+        return jsonify({'usuario': usuario_dict}), 200

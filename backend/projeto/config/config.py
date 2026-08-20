@@ -15,9 +15,11 @@ class Config:
 
     UPLOAD_USER = os.path.join(BASE_DIR, 'uploads', 'user')
     UPLOAD_POSTAGEM = os.path.join(BASE_DIR, 'uploads', 'postagem')
+    UPLOAD_CARD = os.path.join(BASE_DIR, 'uploads', 'card')
 
     os.makedirs(UPLOAD_USER, exist_ok=True)
     os.makedirs(UPLOAD_POSTAGEM, exist_ok=True)
+    os.makedirs(UPLOAD_CARD, exist_ok=True)
 
     # Configurações MYSQL
     MYSQL_HOST = os.getenv('MYSQL_HOST')

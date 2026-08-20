@@ -1,7 +1,9 @@
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from projeto.config import Config
-from projeto.dao import UserDAO
+from projeto.dao import UserDAO, HistoricoSenhaDAO
+from projeto.models import HistoricoSenha
+from werkzeug.security import generate_password_hash
 import os
 
 def create_app():
@@ -30,6 +32,17 @@ def create_app():
 
     with app.app_context():
         user_dao = UserDAO()
+        historico_senha_dao = HistoricoSenhaDAO()
+
         user_dao.criar_usuario_superadmin()
+
+        usuario = user_dao.buscar_usuario_por_email(Config.SUPERADMIN_EMAIL)
+        senha = Config.SUPERADMIN_PASSWORD
+
+        if usuario and not historico_senha_dao.senha_existe(usuario, senha):
+            senha_hash = generate_password_hash(senha)
+
+            historico = HistoricoSenha(usuario, senha_hash)
+            historico_senha_dao.inserir_nova_senha(historico)
 
     return app

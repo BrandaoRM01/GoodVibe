@@ -14,6 +14,7 @@ import { X } from "lucide-react";
 interface FeedSearch {
   tag?: string;
   autor?: string;
+  compose?: boolean;
 }
 
 export const Route = createFileRoute("/feed")({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/feed")({
   validateSearch: (search: Record<string, unknown>): FeedSearch => ({
     tag: typeof search.tag === "string" ? search.tag : undefined,
     autor: typeof search.autor === "string" ? search.autor : undefined,
+    compose: search.compose === true || search.compose === "true" ? true : undefined,
   }),
   component: FeedPage,
 });
@@ -66,7 +68,7 @@ function mapearPostagem(p: PostagemAPI): Post {
 }
 
 function FeedPage() {
-  const { tag, autor } = Route.useSearch();
+  const { tag, autor, compose } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: postagens, isLoading, isError, error } = useFeed(tag, autor);
 
@@ -76,6 +78,10 @@ function FeedPage() {
 
   function limparAutor() {
     navigate({ search: (prev) => ({ ...prev, autor: undefined }) });
+  }
+
+  function limparCompose() {
+    navigate({ search: (prev) => ({ ...prev, compose: undefined }) });
   }
 
   return (
@@ -95,7 +101,7 @@ function FeedPage() {
         </header>
 
         <div className="space-y-4">
-          <Composer />
+          <Composer autoAbrir={compose} onAutoAbrirConsumido={limparCompose} />
 
           {(tag || autor) && (
             <div className="flex flex-wrap items-center gap-2 px-1">

@@ -57,8 +57,11 @@ export type Usuario = {
     pode_gerenciar_usuarios: boolean;
     qtd_seguidores: number;
     qtd_seguindo: number;
-    qtd_conquistas: number;
     qtd_postagens: number;
+    descricao_perfil: string | null;
+    data_entrada: string | null;
+    url_capa: string | null;
+    localizacao: string | null;
 };
 
 export async function apiLogin(email: string, senha: string): Promise<Usuario> {
@@ -88,6 +91,25 @@ export async function apiCadastrar(params: {
     return request("/api/usuarios/cadastro", { method: "POST", body: formData });
 }
 
+export async function apiEditarPerfil(params: {
+    username: string;
+    foto?: File | null;
+    descricaoPerfil?: string;
+    localizacao?: string;
+    capa?: File | null;
+}): Promise<Usuario> {
+    const formData = new FormData();
+    formData.append("username", params.username);
+    if (params.foto) formData.append("foto", params.foto);
+    if (params.descricaoPerfil !== undefined) formData.append("descricao_perfil", params.descricaoPerfil);
+    if (params.localizacao !== undefined) formData.append("localizacao", params.localizacao);
+    if (params.capa) formData.append("capa", params.capa);
+
+    const data = await request("/api/usuarios/editar-perfil", { method: "POST", body: formData });
+    setToken(data.token);
+    return data.usuario;
+}
+
 export async function apiMe(): Promise<Usuario> {
     const data = await request("/api/usuarios/me");
     return data.usuario;
@@ -99,4 +121,31 @@ export async function apiLogout(): Promise<void> {
     } finally {
         clearToken();
     }
+}
+
+export async function apiApagarPerfil(email: string): Promise<void> {
+    try {
+        await request(`/api/usuarios/apagar-perfil/${encodeURIComponent(email)}`, { method: "DELETE" });
+    } finally {
+        clearToken();
+    }
+}
+
+export async function apiAlterarSenha(params: {
+    senhaAtual: string;
+    senhaNova: string;
+    confirmarSenhaNova: string;
+}): Promise<void> {
+    const formData = new FormData();
+    formData.append("senha_atual", params.senhaAtual);
+    formData.append("senha_nova", params.senhaNova);
+    formData.append("confirmar_senha_nova", params.confirmarSenhaNova);
+
+    const data = await request("/api/usuarios/alterar-senha", { method: "POST", body: formData });
+    setToken(data.token);
+}
+
+export async function apiBuscarUsuarioPorEmail(email: string): Promise<Usuario> {
+    const data = await request(`/api/usuarios/perfil/${encodeURIComponent(email)}`);
+    return data.usuario;
 }

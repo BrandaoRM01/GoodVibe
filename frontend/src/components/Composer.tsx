@@ -12,7 +12,12 @@ import { ToolBtn } from "@/components/toolbar-button";
 
 const MAX_TAGS = 5;
 
-export function Composer() {
+interface ComposerProps {
+  autoAbrir?: boolean;
+  onAutoAbrirConsumido?: () => void;
+}
+
+export function Composer({ autoAbrir, onAutoAbrirConsumido }: ComposerProps) {
   const [text, setText] = useState("");
   const [imagem, setImagem] = useState<File | null>(null);
   const [imagemPreviewUrl, setImagemPreviewUrl] = useState<string | null>(null);
@@ -31,6 +36,13 @@ export function Composer() {
 
   const podePublicar = text.trim().length > 0 && !criarPostagem.isPending;
   const atingiuLimite = tags.length >= MAX_TAGS;
+
+  useEffect(() => {
+    if (!autoAbrir) return;
+    textareaRef.current?.focus();
+    textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    onAutoAbrirConsumido?.();
+  }, [autoAbrir, onAutoAbrirConsumido]);
 
   useEffect(() => {
     if (!imagem) {

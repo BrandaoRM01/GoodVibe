@@ -16,6 +16,7 @@ import {
   type EditarPostagemPayload,
 } from "./postagens";
 
+
 export function useSugestoesTags(termo: string) {
   return useQuery<TagSugestaoAPI[]>({
     queryKey: ["tags-sugestoes", termo],
@@ -42,12 +43,19 @@ export function usePostagem(id: number) {
   });
 }
 
+function invalidarWidgetsRail(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({ queryKey: ["tags-tendencias"] });
+  queryClient.invalidateQueries({ queryKey: ["usuarios-destaque"] });
+  queryClient.invalidateQueries({ queryKey: ["usuario-atual"] });
+}
+
 export function useCriarPostagem() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CriarPostagemPayload) => apiCriarPostagem(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feed"] });
+      invalidarWidgetsRail(queryClient);
     },
   });
 }
@@ -93,6 +101,7 @@ export function useExcluirPostagem() {
     mutationFn: (id: number) => apiExcluirPostagem(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["feed"] });
+      invalidarWidgetsRail(queryClient);
     },
   });
 }
@@ -112,6 +121,7 @@ export function useEditarPostagem() {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["feed"] });
       queryClient.invalidateQueries({ queryKey: ["postagem", variables.id] });
+      invalidarWidgetsRail(queryClient);
     },
   });
 }

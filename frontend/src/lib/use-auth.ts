@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiLogin, apiCadastrar, apiLogout, apiMe, getToken, type Usuario } from "./api";
+import { apiLogin, apiCadastrar, apiLogout, apiMe, getToken, apiEditarPerfil, apiApagarPerfil, apiAlterarSenha, apiBuscarUsuarioPorEmail, type Usuario } from "./api";
 
 export function useUsuarioAtual() {
     return useQuery<Usuario | null>({
@@ -32,6 +32,18 @@ export function useCadastro() {
     });
 }
 
+export function useEditarPerfil() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: apiEditarPerfil,
+        onSuccess: (usuario) => {
+            queryClient.setQueryData(["usuario-atual"], usuario);
+            queryClient.invalidateQueries({ queryKey: ["postagens"] });
+            queryClient.invalidateQueries({ queryKey: ["feed"] });
+        },
+    });
+}
+
 export function useLogout() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -39,5 +51,31 @@ export function useLogout() {
         onSuccess: () => {
             queryClient.setQueryData(["usuario-atual"], null);
         },
+    });
+}
+
+export function useApagarPerfil() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (email: string) => apiApagarPerfil(email),
+        onSuccess: () => {
+            queryClient.setQueryData(["usuario-atual"], null);
+            queryClient.clear();
+        },
+    });
+}
+
+export function useAlterarSenha() {
+    return useMutation({
+        mutationFn: apiAlterarSenha,
+    });
+}
+
+export function useUsuarioPorEmail(email: string | undefined) {
+    return useQuery<Usuario>({
+        queryKey: ["usuario-perfil", email],
+        queryFn: () => apiBuscarUsuarioPorEmail(email!),
+        enabled: !!email,
+        staleTime: 60 * 1000,
     });
 }

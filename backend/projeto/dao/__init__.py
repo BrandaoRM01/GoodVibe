@@ -16,3 +16,4 @@ class BaseDAO:
     
 from .userDAO import UserDAO
 from .postagemDAO import PostagemDAO
+from .historicoSenhaDAO import HistoricoSenhaDAO
