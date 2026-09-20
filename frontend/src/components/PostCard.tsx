@@ -280,7 +280,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
             </div>
           )}
 
-          <p className="mt-3 text-[15px] leading-relaxed">{post.content}</p>
+          <p className="mt-3 text-[17px] leading-relaxed">{post.content}</p>
 
           {post.tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -291,7 +291,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
                     key={t}
                     type="button"
                     onClick={() => filtrarPorTag(nomeLimpo)}
-                    className="text-xs px-2.5 py-1 rounded-full bg-accent text-accent-foreground hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
+                    className="text-sm px-2.5 py-1 rounded-full bg-accent text-accent-foreground hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors"
                   >
                     #{nomeLimpo}
                   </button>
@@ -342,7 +342,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
             onChange={(e) => setTextoEdicao(e.target.value)}
             placeholder="Compartilhe uma boa vibração hoje..."
             rows={2}
-            className="mt-3 w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground text-[15px]"
+            className="mt-3 w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground text-[17px]"
           />
 
           {tagsEdicao.length > 0 && (
@@ -350,7 +350,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
               {tagsEdicao.map((t) => (
                 <span
                   key={t}
-                  className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
+                  className="inline-flex items-center gap-1 text-sm px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
                 >
                   #{t}
                   <button type="button" onClick={() => removerTagEdicao(t)} className="hover:text-destructive">

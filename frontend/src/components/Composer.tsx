@@ -147,7 +147,7 @@ export function Composer({ autoAbrir, onAutoAbrirConsumido }: ComposerProps) {
         placeholder="Compartilhe uma boa vibração hoje..."
         rows={2}
         disabled={criarPostagem.isPending}
-        className="mt-3 w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground text-[15px] disabled:opacity-60"
+        className="mt-3 w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground text-[17px] disabled:opacity-60"
       />
 
       {tags.length > 0 && (
@@ -155,7 +155,7 @@ export function Composer({ autoAbrir, onAutoAbrirConsumido }: ComposerProps) {
           {tags.map((t) => (
             <span
               key={t}
-              className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
+              className="inline-flex items-center gap-1 text-sm px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
             >
               #{t}
               <button
