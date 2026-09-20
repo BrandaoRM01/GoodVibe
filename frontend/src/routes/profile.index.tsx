@@ -7,7 +7,7 @@ import { useFeed } from "@/lib/use-postagens";
 import { Settings, PlusCircle, MoreVertical, KeyRound, LogOut, Trash2, Eye, EyeOff } from "lucide-react";
 import { useUsuarioAtual, useApagarPerfil, useLogout, useAlterarSenha } from "@/lib/use-auth";
 import { motion, AnimatePresence } from "framer-motion";
-import { EditProfile } from "@/components/editProfile";
+import { EditProfile } from "@/components/EditProfile";
 import { API_URL, ApiError } from "@/lib/api";
 import { toast } from "sonner";
 
