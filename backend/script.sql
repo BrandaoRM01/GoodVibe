@@ -65,6 +65,34 @@ CREATE TABLE IF NOT EXISTS curtidas (
     FOREIGN KEY (usuario_email) REFERENCES usuarios(email) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS comentarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    postagem_id INT NOT NULL,
+    autor_email VARCHAR(150) NOT NULL,
+    comentario_pai_id INT DEFAULT NULL,
+    conteudo VARCHAR(500) NOT NULL,
+    profundidade TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    total_curtidas INT NOT NULL DEFAULT 0,
+    total_respostas INT NOT NULL DEFAULT 0,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    editado_em DATETIME DEFAULT NULL,
+
+    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE,
+    FOREIGN KEY (autor_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+    FOREIGN KEY (comentario_pai_id) REFERENCES comentarios(id) ON DELETE CASCADE,
+
+    INDEX idx_comentarios_postagem_raiz (postagem_id, comentario_pai_id, criado_em),
+    INDEX idx_comentarios_pai (comentario_pai_id, criado_em)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS curtidas_comentarios (
+    comentario_id INT NOT NULL,
+    usuario_email VARCHAR(150) NOT NULL,
+    PRIMARY KEY (comentario_id, usuario_email),
+    FOREIGN KEY (comentario_id) REFERENCES comentarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_email) REFERENCES usuarios(email) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE OR REPLACE VIEW vw_postagens AS
 SELECT
     p.id, p.conteudo, p.url_imagem, p.boa_acao,

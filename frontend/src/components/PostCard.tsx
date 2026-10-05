@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, MessageCircle, Share2, MoreHorizontal, Pencil, Trash2, Flag, Image, X, Send, Smile, Sparkles } from "lucide-react";
 import { useCurtirPostagem, useDescurtirPostagem, useExcluirPostagem, useEditarPostagem } from "@/lib/use-postagens";
 import { useUsuarioAtual } from "@/lib/use-auth";
@@ -11,12 +11,14 @@ import { TagSearchBox } from "@/components/tag-search-box";
 import { ToolBtn } from "@/components/toolbar-button";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api";
+import { ComentariosModal } from "@/components/ComentariosModal";
 
 const MAX_TAGS_EDICAO = 5;
 
 export type Post = {
   id: string;
   author: string;
+  authorEmail?: string;
   handle: string;
   avatar: string;
   avatarFotoUrl?: string;
@@ -33,6 +35,13 @@ export type Post = {
 export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
   const [liked, setLiked] = useState(post.liked ?? false);
   const [likes, setLikes] = useState(post.likes);
+
+  const [comentariosAbertos, setComentariosAbertos] = useState(false);
+  const [totalComentarios, setTotalComentarios] = useState(post.comments);
+
+  useEffect(() => {
+    setTotalComentarios(post.comments);
+  }, [post.comments]);
 
   const [menuAberto, setMenuAberto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -212,16 +221,21 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
       className="rounded-3xl bg-card border border-border p-5 shadow-soft hover:shadow-glow transition-shadow"
     >
       <header className="flex items-center gap-3">
-        <div className="h-11 w-11 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold shrink-0 overflow-hidden">
+        <PerfilLink
+          email={post.authorEmail}
+          className="h-11 w-11 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold shrink-0 overflow-hidden hover:opacity-80 transition-opacity"
+        >
           {post.avatarFotoUrl ? (
             <img src={post.avatarFotoUrl} alt="" className="w-full h-full object-cover" />
           ) : (
             post.avatar
           )}
-        </div>
+        </PerfilLink>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="font-semibold text-sm">{post.author}</p>
+            <PerfilLink email={post.authorEmail} className="font-semibold text-sm hover:underline">
+              {post.author}
+            </PerfilLink>
             <span className="text-xs text-muted-foreground">·</span>
             <span className="text-xs text-muted-foreground">{post.time}</span>
           </div>
@@ -308,7 +322,11 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
               disabled={enviando}
               onClick={handleToggleLike}
             />
-            <Action icon={<MessageCircle className="h-4 w-4" />} label={String(post.comments)} />
+            <Action
+              icon={<MessageCircle className="h-4 w-4" />}
+              label={String(totalComentarios)}
+              onClick={() => setComentariosAbertos(true)}
+            />
             <Action icon={<Share2 className="h-4 w-4" />} label={String(post.shares)} />
           </footer>
         </>
@@ -448,7 +466,35 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
           </div>
         </div>
       )}
+
+      <ComentariosModal
+        postagemId={Number(post.id)}
+        aberto={comentariosAbertos}
+        onFechar={() => setComentariosAbertos(false)}
+        souAutorPostagem={souAutor}
+        onTotalChange={setTotalComentarios}
+      />
     </motion.article>
+  );
+}
+
+function PerfilLink({
+  email,
+  className,
+  children,
+}: {
+  email?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  if (!email) {
+    return <span className={className}>{children}</span>;
+  }
+
+  return (
+    <Link to="/profile/$email" params={{ email }} className={className}>
+      {children}
+    </Link>
   );
 }
 

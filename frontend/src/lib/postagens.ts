@@ -3,6 +3,7 @@ import { request } from "./api";
 export interface PostagemAPI {
     id: number;
     author: string;
+    authorEmail: string;
     handle: string;
     avatarUrl: string | null;
     time: string | null;

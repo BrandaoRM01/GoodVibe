@@ -1,2 +1,3 @@
 from .userController import UserController
 from .postagemController import PostagemController
+from .comentarioController import ComentarioController

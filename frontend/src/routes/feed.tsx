@@ -53,6 +53,7 @@ function mapearPostagem(p: PostagemAPI): Post {
   return {
     id: String(p.id),
     author: p.author,
+    authorEmail: p.authorEmail,
     handle: p.handle,
     avatar: p.author?.charAt(0)?.toUpperCase() ?? "?",
     avatarFotoUrl: p.avatarUrl ? `${API_URL}/${p.avatarUrl}` : undefined,

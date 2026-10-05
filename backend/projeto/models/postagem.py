@@ -79,5 +79,6 @@ class Postagem:
             "shares": self.__total_compartilhamentos,
             "goodDeed": self.__boa_acao,
             "status": self.__status,
-            "curtidoPorMim": self.foi_curtido_por(email_usuario) if email_usuario else False
+            "curtidoPorMim": self.foi_curtido_por(email_usuario) if email_usuario else False,
+            'authorEmail': self.autor.email,
         }

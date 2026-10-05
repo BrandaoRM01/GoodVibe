@@ -22,9 +22,10 @@ def create_app():
         supports_credentials=False,
     )
 
-    from projeto.blueprints import user_bp, postagem_bp
+    from projeto.blueprints import user_bp, postagem_bp, comentario_bp
     app.register_blueprint(user_bp)
     app.register_blueprint(postagem_bp)
+    app.register_blueprint(comentario_bp)
 
     @app.route('/uploads/<path:subpath>')
     def servir_uploads(subpath):
