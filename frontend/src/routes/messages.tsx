@@ -4,11 +4,20 @@ import { MobileNav } from "@/components/MobileNav";
 import { Search, Send, Smile, Paperclip, Phone, Video, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { RotaProtegida } from "@/components/RotaProtegida";
 
 export const Route = createFileRoute("/messages")({
   head: () => ({ meta: [{ title: "Mensagens — GoodVib&" }] }),
   component: MessagesPage,
 });
+
+function MessagesPage() {
+  return (
+    <RotaProtegida>
+      <MessagesConteudo />
+    </RotaProtegida>
+  );
+}
 
 const conversations = [
   { id: "1", name: "Marina Costa", last: "Adorei sua boa ação de hoje!", time: "agora", online: true, unread: 2, avatar: "M" },
@@ -25,7 +34,7 @@ const initialMsgs = [
   { id: 4, from: "me", text: "Claroo, vai ser ótimo! Marca a gente lá ✨" },
 ];
 
-function MessagesPage() {
+function MessagesConteudo() {
   const [active, setActive] = useState(conversations[0]);
   const [msgs, setMsgs] = useState(initialMsgs);
   const [text, setText] = useState("");
@@ -108,11 +117,10 @@ function MessagesPage() {
                 transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
                 className={`flex ${m.from === "me" ? "justify-end" : "justify-start"}`}
               >
-                <div className={`max-w-[70%] px-4 py-2.5 rounded-3xl text-sm ${
-                  m.from === "me"
-                    ? "gradient-primary text-primary-foreground rounded-br-md shadow-soft"
-                    : "bg-card border border-border rounded-bl-md"
-                }`}>
+                <div className={`max-w-[70%] px-4 py-2.5 rounded-3xl text-sm ${m.from === "me"
+                  ? "gradient-primary text-primary-foreground rounded-br-md shadow-soft"
+                  : "bg-card border border-border rounded-bl-md"
+                  }`}>
                   {m.text}
                 </div>
               </motion.div>

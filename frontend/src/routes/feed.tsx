@@ -10,6 +10,7 @@ import { useFeed } from "@/lib/use-postagens";
 import type { PostagemAPI } from "@/lib/postagens";
 import { API_URL } from "@/lib/api";
 import { X } from "lucide-react";
+import { RotaProtegida } from "@/components/RotaProtegida";
 
 interface FeedSearch {
   tag?: string;
@@ -26,6 +27,14 @@ export const Route = createFileRoute("/feed")({
   }),
   component: FeedPage,
 });
+
+function FeedPage() {
+  return (
+    <RotaProtegida>
+      <FeedConteudo />
+    </RotaProtegida>
+  );
+}
 
 function formatarData(dataStr: string | null): string {
   if (!dataStr) return "";
@@ -68,7 +77,7 @@ function mapearPostagem(p: PostagemAPI): Post {
   };
 }
 
-function FeedPage() {
+function FeedConteudo() {
   const { tag, autor, compose } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: postagens, isLoading, isError, error } = useFeed(tag, autor);

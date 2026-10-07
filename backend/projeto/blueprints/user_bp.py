@@ -65,3 +65,15 @@ def usuarios_destaque():
 @token_required
 def alterar_senha():
     return controller.alterar_senha()
+
+@user_bp.route('/admin/resumo', methods=['GET'])
+@token_required
+@moderador_required
+def resumo_admin():
+    return controller.resumo_admin()
+
+@user_bp.route('/admin/ranking', methods=['GET'])
+@token_required
+@moderador_required
+def ranking_usuarios():
+    return controller.ranking_usuarios()

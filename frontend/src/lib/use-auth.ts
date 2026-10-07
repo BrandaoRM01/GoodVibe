@@ -13,6 +13,8 @@ export function useUsuarioAtual() {
             }
         },
         staleTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: "always",
+        refetchInterval: 60 * 1000,
     });
 }
 
@@ -20,8 +22,13 @@ export function useLogin() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ email, senha }: { email: string; senha: string }) => apiLogin(email, senha),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["usuario-atual"] });
+        onSuccess: async () => {
+            queryClient.removeQueries({
+                predicate: (q) => q.queryKey[0] !== "usuario-atual",
+            });
+
+            const usuario = await apiMe();
+            queryClient.setQueryData(["usuario-atual"], usuario);
         },
     });
 }
@@ -49,6 +56,7 @@ export function useLogout() {
     return useMutation({
         mutationFn: apiLogout,
         onSuccess: () => {
+            queryClient.clear();
             queryClient.setQueryData(["usuario-atual"], null);
         },
     });

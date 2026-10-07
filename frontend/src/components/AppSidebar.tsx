@@ -3,6 +3,8 @@ import {
   Home, Compass, MessageCircle, Bell, User, Settings, Sparkles, Heart, ShieldCheck,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useUsuarioAtual } from "@/lib/use-auth";
+import { ehAdmin } from "@/components/RotaProtegida";
 
 const items = [
   { to: "/feed", label: "Início", icon: Home },
@@ -10,12 +12,15 @@ const items = [
   { to: "/messages", label: "Mensagens", icon: MessageCircle },
   { to: "/feed", label: "Notificações", icon: Bell },
   { to: "/profile", label: "Perfil", icon: User },
-  { to: "/admin", label: "Painel", icon: ShieldCheck },
+  { to: "/admin", label: "Painel", icon: ShieldCheck, somenteAdmin: true },
 ];
 
 export function AppSidebar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
+
+  const { data: usuario } = useUsuarioAtual();
+  const itensVisiveis = items.filter((it) => !it.somenteAdmin || ehAdmin(usuario));
 
   return (
     <aside className="hidden md:flex sticky top-0 h-screen w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-6">
@@ -29,7 +34,7 @@ export function AppSidebar() {
       </Link>
 
       <nav className="flex flex-col gap-1">
-        {items.map((it, i) => {
+        {itensVisiveis.map((it, i) => {
           const active = path === it.to && i === 0 ? true : path.startsWith(it.to) && it.to !== "/feed";
           const isActive = path === it.to;
           return (

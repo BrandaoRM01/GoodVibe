@@ -6,6 +6,7 @@ import { ProfileView, mapPostagemParaPost } from "@/components/ProfileView";
 import { useFeed } from "@/lib/use-postagens";
 import { useUsuarioAtual, useUsuarioPorEmail } from "@/lib/use-auth";
 import { UserPlus } from "lucide-react";
+import { RotaProtegida } from "@/components/RotaProtegida";
 
 export const Route = createFileRoute("/profile/$email")({
     head: () => ({ meta: [{ title: "Perfil — GoodVib&" }] }),
@@ -13,6 +14,14 @@ export const Route = createFileRoute("/profile/$email")({
 });
 
 function PerfilPublicoPage() {
+    return (
+        <RotaProtegida>
+            <PerfilPublicoConteudo />
+        </RotaProtegida>
+    );
+}
+
+function PerfilPublicoConteudo() {
     const { email } = Route.useParams();
     const navigate = useNavigate();
 

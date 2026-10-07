@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EditProfile } from "@/components/EditProfile";
 import { API_URL, ApiError } from "@/lib/api";
 import { toast } from "sonner";
+import { RotaProtegida } from "@/components/RotaProtegida";
 
 export const Route = createFileRoute("/profile/")({
   head: () => ({ meta: [{ title: "Perfil — GoodVib&" }] }),
@@ -17,6 +18,14 @@ export const Route = createFileRoute("/profile/")({
 });
 
 function ProfilePage() {
+  return (
+    <RotaProtegida>
+      <ProfileConteudo />
+    </RotaProtegida>
+  );
+}
+
+function ProfileConteudo() {
   const { data: usuario, isLoading: carregandoUsuario } = useUsuarioAtual();
   const { data: postagensAPI, isLoading: carregandoFeed } = useFeed(undefined, usuario?.username, {
     enabled: !!usuario?.username,

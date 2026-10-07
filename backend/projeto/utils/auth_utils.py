@@ -2,6 +2,7 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from flask import request, jsonify, current_app
+from projeto.dao import UserDAO
 
 def gerar_token(usuario_dict, expira_em_horas=24):
     payload = {
@@ -35,6 +36,16 @@ def token_required(f):
             return jsonify({'erro': 'Sessão expirada. Faça login novamente.'}), 401
         except jwt.InvalidTokenError:
             return jsonify({'erro': 'Token inválido.'}), 401
+
+        # As permissões vêm do banco, e não do token, para valerem na hora quando alteradas
+        usuario_db = UserDAO().buscar_usuario_por_email(payload.get('email'))
+
+        if not usuario_db:
+            return jsonify({'erro': 'Usuário não encontrado. Faça login novamente.'}), 401
+
+        payload['tipo_usuario'] = usuario_db.tipo_usuario()
+        payload['pode_moderar'] = usuario_db.pode_moderar()
+        payload['pode_gerenciar_usuarios'] = usuario_db.pode_gerenciar_usuarios()
 
         request.usuario_atual = payload
         return f(*args, **kwargs)

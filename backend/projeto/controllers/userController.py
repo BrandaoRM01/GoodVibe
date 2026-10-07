@@ -130,6 +130,19 @@ class UserController:
         return jsonify({'mensagem': 'Logout realizado com sucesso.'}), 200
 
     def excluir_usuario(self, email):
+        usuario_logado = request.usuario_atual
+
+        if email == usuario_logado.get('email'):
+            return jsonify({'erro': 'Você não pode excluir a sua própria conta por aqui.'}), 400
+
+        usuario = self.__dao_usuario.buscar_usuario_por_email(email)
+
+        if not usuario:
+            return jsonify({'erro': 'Usuário não encontrado.'}), 404
+
+        if usuario.tipo_usuario() == 'superadmin':
+            return jsonify({'erro': 'Não é possível excluir um superadmin.'}), 403
+
         self.__dao_usuario.excluir_usuario(email)
         return jsonify({'mensagem': 'Usuário excluído com sucesso.'}), 200
 
@@ -151,6 +164,9 @@ class UserController:
 
         if not usuario:
             return jsonify({'erro': 'Usuário não encontrado'}), 404
+
+        if usuario.tipo_usuario() == 'superadmin':
+            return jsonify({'erro': 'Não é possível alterar a permissão de um superadmin.'}), 403
 
         if usuario.tipo_usuario() == 'admin':
             self.__dao_usuario.alterar_permissao_usuario(usuario, 'user')
@@ -358,3 +374,26 @@ class UserController:
         usuario_dict['qtd_postagens'] = self.__postagem_dao.contar_postagens_por_autor(email)
 
         return jsonify({'usuario': usuario_dict}), 200
+
+    def resumo_admin(self):
+        resumo = self.__dao_usuario.buscar_resumo_admin()
+        return jsonify(resumo), 200
+
+    def ranking_usuarios(self):
+        busca = (request.args.get('busca') or '').strip()
+        tipo = request.args.get('tipo')
+        limite = min(max(request.args.get('limite', default=20, type=int), 1), 50)
+        offset = max(request.args.get('offset', default=0, type=int), 0)
+
+        if tipo not in ('user', 'admin', 'superadmin'):
+            tipo = None
+
+        usuarios, total = self.__dao_usuario.listar_ranking_usuarios(busca, tipo, limite, offset)
+
+        proximo_offset = offset + limite if offset + limite < total else None
+
+        return jsonify({
+            'usuarios': usuarios,
+            'total': total,
+            'proximoOffset': proximo_offset
+        }), 200
