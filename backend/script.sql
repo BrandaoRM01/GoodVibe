@@ -93,6 +93,25 @@ CREATE TABLE IF NOT EXISTS curtidas_comentarios (
     FOREIGN KEY (usuario_email) REFERENCES usuarios(email) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS denuncias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('postagem', 'comentario') NOT NULL,
+    postagem_id INT DEFAULT NULL,
+    comentario_id INT DEFAULT NULL,
+    denunciante_email VARCHAR(150) NOT NULL,
+    motivo VARCHAR(30) NOT NULL,
+    descricao VARCHAR(300) DEFAULT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE,
+    FOREIGN KEY (comentario_id) REFERENCES comentarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (denunciante_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+
+    UNIQUE KEY uq_denuncia_postagem (denunciante_email, postagem_id),
+    UNIQUE KEY uq_denuncia_comentario (denunciante_email, comentario_id),
+    INDEX idx_denuncias_criado_em (criado_em)
+) ENGINE=InnoDB;
+
 CREATE OR REPLACE VIEW vw_postagens AS
 SELECT
     p.id, p.conteudo, p.url_imagem, p.boa_acao,

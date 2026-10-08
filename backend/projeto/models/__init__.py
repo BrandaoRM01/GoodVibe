@@ -3,3 +3,4 @@ from .postagem import Postagem
 from .tag import Tag
 from .historico_senha import HistoricoSenha
 from .comentario import Comentario
+from .denuncia import Denuncia

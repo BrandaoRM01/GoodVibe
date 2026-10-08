@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from projeto.dao import UserDAO, PostagemDAO, HistoricoSenhaDAO
+from projeto.dao import UserDAO, PostagemDAO, HistoricoSenhaDAO, DenunciaDAO
 from projeto.models import HistoricoSenha
 from projeto.factorys import UsuarioFactory
 from projeto.config import Config
@@ -377,6 +377,7 @@ class UserController:
 
     def resumo_admin(self):
         resumo = self.__dao_usuario.buscar_resumo_admin()
+        resumo['denunciasAbertas'] = DenunciaDAO().contar_abertas()
         return jsonify(resumo), 200
 
     def ranking_usuarios(self):

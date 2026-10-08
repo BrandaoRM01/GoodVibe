@@ -19,6 +19,7 @@ import {
   MAX_PROFUNDIDADE_COMENTARIO,
   type ComentarioAPI,
 } from "@/lib/comentarios";
+import { DenunciarModal } from "@/components/DenunciarModal";
 
 type ComentariosContexto = {
   postagemId: number;
@@ -322,6 +323,7 @@ function ComentarioItem({ comentario }: { comentario: ComentarioAPI }) {
   const [likes, setLikes] = useState(comentario.likes);
   const [editando, setEditando] = useState(false);
   const [textoEdicao, setTextoEdicao] = useState(comentario.content);
+  const [denunciaAberta, setDenunciaAberta] = useState(false);
 
   // mantém o estado local alinhado quando a lista é recarregada
   useEffect(() => {
@@ -335,6 +337,7 @@ function ComentarioItem({ comentario }: { comentario: ComentarioAPI }) {
 
   const souAutor = ctx.emailAtual === comentario.authorEmail;
   const podeExcluir = souAutor || ctx.souAutorPostagem || ctx.podeModerar;
+  const podeDenunciar = !souAutor && !ctx.podeModerar;
   const podeResponder = comentario.depth < MAX_PROFUNDIDADE_COMENTARIO;
 
   function handleCurtir() {
@@ -481,6 +484,15 @@ function ComentarioItem({ comentario }: { comentario: ComentarioAPI }) {
                 {excluirComentario.isPending ? "Excluindo..." : "Excluir"}
               </button>
             )}
+            {podeDenunciar && (
+              <button
+                type="button"
+                onClick={() => setDenunciaAberta(true)}
+                className="font-semibold hover:text-destructive"
+              >
+                Denunciar
+              </button>
+            )}
           </div>
         </div>
 
@@ -500,6 +512,12 @@ function ComentarioItem({ comentario }: { comentario: ComentarioAPI }) {
           <RespostasLista comentario={comentario} />
         </div>
       )}
+      <DenunciarModal
+        aberto={denunciaAberta}
+        onFechar={() => setDenunciaAberta(false)}
+        tipo="comentario"
+        alvoId={comentario.id}
+      />
     </div>
   );
 }

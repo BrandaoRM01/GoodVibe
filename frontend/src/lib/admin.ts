@@ -21,6 +21,7 @@ export interface UsuarioRankingAPI {
 
 export interface ResumoAdminAPI {
     totalUsuarios: number;
+    denunciasAbertas: number;
     kpis: {
         usuariosAtivos: { valor: number; variacao: number | null };
         boasAcoesHoje: { valor: number; variacao: number | null };

@@ -12,6 +12,7 @@ import { ToolBtn } from "@/components/toolbar-button";
 import { toast } from "sonner";
 import { ApiError } from "@/lib/api";
 import { ComentariosModal } from "@/components/ComentariosModal";
+import { DenunciarModal } from "@/components/DenunciarModal";
 
 const MAX_TAGS_EDICAO = 5;
 
@@ -37,6 +38,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
   const [likes, setLikes] = useState(post.likes);
 
   const [comentariosAbertos, setComentariosAbertos] = useState(false);
+  const [denunciaAberta, setDenunciaAberta] = useState(false);
   const [totalComentarios, setTotalComentarios] = useState(post.comments);
 
   useEffect(() => {
@@ -211,6 +213,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
 
   function handleDenunciar() {
     setMenuAberto(false);
+    setDenunciaAberta(true);
   }
 
   return (
@@ -473,6 +476,12 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
         onFechar={() => setComentariosAbertos(false)}
         souAutorPostagem={souAutor}
         onTotalChange={setTotalComentarios}
+      />
+      <DenunciarModal
+        aberto={denunciaAberta}
+        onFechar={() => setDenunciaAberta(false)}
+        tipo="postagem"
+        alvoId={Number(post.id)}
       />
     </motion.article>
   );

@@ -6,12 +6,15 @@ import { UsuariosAdminModal } from "@/components/UsuariosAdminModal";
 import { AvatarUsuario, TipoUsuarioBadge, PerfilUsuarioLink } from "@/components/UsuarioAdminUI";
 import { useResumoAdmin } from "@/lib/use-admin";
 import {
-  Users, Heart, Flag, TrendingUp, MoreHorizontal, Search, ShieldCheck, Trash2, Check, type LucideIcon,
+  Users, Heart, Flag, TrendingUp, MoreHorizontal, Search, ShieldCheck, type LucideIcon,
 } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, BarChart, Bar, CartesianGrid } from "recharts";
 import { motion } from "framer-motion";
 import { AcoesUsuarioAdmin } from "@/components/AcoesUsuarioAdmin";
 import { RotaProtegida } from "@/components/RotaProtegida";
+import { useDenunciasPainel } from "@/lib/use-denuncias";
+import { ItemDenuncia } from "@/components/DenunciasAdminUI";
+import { DenunciasAdminModal } from "@/components/DenunciasAdminModal";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Painel administrativo — GoodVib&" }] }),
@@ -25,13 +28,6 @@ function AdminPage() {
     </RotaProtegida>
   );
 }
-
-// Denúncias seguem fixas até o sistema de denúncias ser criado
-const reports = [
-  { user: "@spam_user", reason: "Conteúdo repetitivo", time: "5min" },
-  { user: "@negative_x", reason: "Comentário desrespeitoso", time: "2h" },
-  { user: "@unknown", reason: "Possível bot", time: "ontem" },
-];
 
 type Kpi = {
   label: string;
@@ -55,7 +51,9 @@ const tooltipStyle = {
 
 function AdminConteudo() {
   const { data: resumo, isLoading, isError } = useResumoAdmin();
+  const { data: painelDenuncias, isLoading: carregandoDenuncias } = useDenunciasPainel();
   const [verTodos, setVerTodos] = useState(false);
+  const [verDenuncias, setVerDenuncias] = useState(false);
 
   const variacaoAtivos = resumo?.kpis.usuariosAtivos.variacao;
   const variacaoBoasAcoes = resumo?.kpis.boasAcoesHoje.variacao;
@@ -84,8 +82,13 @@ function AdminConteudo() {
       hint: "Percentual de usuários ativos nos últimos 30 dias em relação ao total de usuários",
       icon: TrendingUp,
     },
-    // Denúncias: continua fixo até o sistema de denúncias existir
-    { label: "Denúncias abertas", value: "12", trend: "-22%", icon: Flag },
+    {
+      label: "Denúncias abertas",
+      value: resumo ? resumo.denunciasAbertas.toLocaleString("pt-BR") : "—",
+      trend: null,
+      hint: "Denúncias de postagens e comentários aguardando análise",
+      icon: Flag,
+    },
   ];
 
   return (
@@ -250,27 +253,37 @@ function AdminConteudo() {
           </div>
 
           <div className="rounded-3xl bg-card border border-border p-5 shadow-soft">
-            <h3 className="font-bold mb-4">Moderação pendente</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold">Moderação pendente</h3>
+              {(painelDenuncias?.total ?? 0) > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setVerDenuncias(true)}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  Ver mais
+                </button>
+              )}
+            </div>
+
             <div className="space-y-3">
-              {reports.map((r) => (
-                <div key={r.user} className="flex items-start gap-3 p-3 rounded-2xl bg-muted/40">
-                  <Flag className="h-4 w-4 text-primary mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">{r.user}</p>
-                    <p className="text-xs text-muted-foreground">{r.reason}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{r.time}</p>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <button className="h-7 w-7 rounded-full bg-success/15 text-success grid place-items-center hover:bg-success/25"><Check className="h-3.5 w-3.5" /></button>
-                    <button className="h-7 w-7 rounded-full bg-destructive/15 text-destructive grid place-items-center hover:bg-destructive/25"><Trash2 className="h-3.5 w-3.5" /></button>
-                  </div>
-                </div>
+              {carregandoDenuncias && (
+                <p className="py-6 text-center text-xs text-muted-foreground">Carregando denúncias...</p>
+              )}
+
+              {!carregandoDenuncias && painelDenuncias?.denuncias.length === 0 && (
+                <p className="py-6 text-center text-xs text-muted-foreground">Nenhuma denúncia pendente.</p>
+              )}
+
+              {painelDenuncias?.denuncias.map((d) => (
+                <ItemDenuncia key={d.id} d={d} />
               ))}
             </div>
           </div>
         </div>
 
         <UsuariosAdminModal aberto={verTodos} onFechar={() => setVerTodos(false)} />
+        <DenunciasAdminModal aberto={verDenuncias} onFechar={() => setVerDenuncias(false)} />
       </main>
       <MobileNav />
     </div>
