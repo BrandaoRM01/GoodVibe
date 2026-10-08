@@ -70,7 +70,7 @@ class PostagemDAO(BaseDAO):
         sql += " ORDER BY criado_em DESC"
         return self.__montar_postagens(sql, valores)
 
-    def buscar_usuarios_e_tags(self, termo, limite=6):
+    def buscar_usuarios_e_tags(self, termo, email_usuario, limite=6):
         escapado = termo.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
         contem = f"%{escapado}%"
         comeca = f"{escapado}%"
@@ -78,10 +78,22 @@ class PostagemDAO(BaseDAO):
         sql_usuarios = """
             SELECT u.email, u.username, u.url_foto,
                    (SELECT COUNT(*) FROM postagens p
-                    WHERE p.autor_email = u.email AND p.status = 'aprovado') AS totalPostagens
+                    WHERE p.autor_email = u.email AND p.status = 'aprovado') AS totalPostagens,
+                   CASE
+                       WHEN u.email = %s OR EXISTS (
+                            SELECT 1 FROM seguidores s
+                            WHERE s.seguidor_email = %s AND s.seguido_email = u.email
+                       ) THEN 0
+                       WHEN EXISTS (
+                            SELECT 1 FROM seguidores s1
+                            INNER JOIN seguidores s2 ON s2.seguidor_email = s1.seguido_email
+                            WHERE s1.seguidor_email = %s AND s2.seguido_email = u.email
+                       ) THEN 1
+                       ELSE 2
+                   END AS grupoRede
             FROM usuarios u
             WHERE u.username LIKE %s
-            ORDER BY (u.username LIKE %s) DESC, totalPostagens DESC, u.username ASC
+            ORDER BY grupoRede ASC, (u.username LIKE %s) DESC, totalPostagens DESC, u.username ASC
             LIMIT %s
         """
         sql_tags = """
@@ -98,7 +110,7 @@ class PostagemDAO(BaseDAO):
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
         try:
-            cursor.execute(sql_usuarios, [contem, comeca, limite])
+            cursor.execute(sql_usuarios, [email_usuario, email_usuario, email_usuario, contem, comeca, limite])
             usuarios = cursor.fetchall()
             cursor.execute(sql_tags, [contem, comeca, limite])
             tags = cursor.fetchall()

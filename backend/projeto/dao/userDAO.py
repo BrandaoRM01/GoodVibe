@@ -159,6 +159,18 @@ class UserDAO(BaseDAO):
                     if os.path.exists(caminho_capa):
                         os.remove(caminho_capa)
 
+            cursor.execute("""
+                UPDATE usuarios u
+                INNER JOIN seguidores s ON s.seguido_email = u.email
+                SET u.qtd_seguidores = GREATEST(CAST(u.qtd_seguidores AS SIGNED) - 1, 0)
+                WHERE s.seguidor_email = %s
+            """, valor)
+            cursor.execute("""
+                UPDATE usuarios u
+                INNER JOIN seguidores s ON s.seguidor_email = u.email
+                SET u.qtd_seguindo = GREATEST(CAST(u.qtd_seguindo AS SIGNED) - 1, 0)
+                WHERE s.seguido_email = %s
+            """, valor)
             cursor.execute(sql, valor)
             conexao.commit()
         finally:
@@ -495,3 +507,30 @@ class UserDAO(BaseDAO):
             conexao.close()
 
         return usuarios, total
+
+    def buscar_estatisticas_publicas(self):
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+
+        try:
+            cursor.execute("SELECT COUNT(*) AS total FROM usuarios")
+            total_usuarios = cursor.fetchone()['total']
+
+            cursor.execute("SELECT COUNT(*) AS total FROM postagens WHERE status = 'aprovado'")
+            boas_acoes_total = cursor.fetchone()['total']
+
+            usuarios_ativos = self.__contar_usuarios_ativos(cursor, 30, 0)
+            boas_acoes_hoje = self.__contar_boas_acoes_dia(cursor, 0)
+
+            engajamento = round(usuarios_ativos / total_usuarios * 100) if total_usuarios else 0
+
+            return {
+                'totalUsuarios': total_usuarios,
+                'usuariosAtivos': usuarios_ativos,
+                'boasAcoesTotal': boas_acoes_total,
+                'boasAcoesHoje': boas_acoes_hoje,
+                'engajamento': engajamento
+            }
+        finally:
+            cursor.close()
+            conexao.close()

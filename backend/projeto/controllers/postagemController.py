@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from projeto.dao import PostagemDAO
+from projeto.dao import PostagemDAO, SeguidorDAO
 from projeto.factorys import PostagemFactory, UsuarioFactory
 from projeto.config import Config
 from werkzeug.utils import secure_filename
@@ -8,6 +8,7 @@ import os
 class PostagemController:
     def __init__(self):
         self.__dao_postagem = PostagemDAO()
+        self.__dao_seguidor = SeguidorDAO()
 
     def __extrair_tags(self):
         tags = request.form.getlist('tags')
@@ -32,7 +33,27 @@ class PostagemController:
         tag_nome = request.args.get('tag', '').strip() or None
         autor_username = request.args.get('autor', '').strip() or None
         postagens = self.__dao_postagem.listar_feed(tag_nome, autor_username)
-        return jsonify({'postagens': [p.to_dict(email_usuario) for p in postagens]}), 200
+
+        seguindo = set(self.__dao_seguidor.emails_seguindo(email_usuario))
+        conhecidos = self.__dao_seguidor.emails_conhecidos(email_usuario)
+
+        def grupo_rede(postagem):
+            autor_email = postagem.autor.email
+            if autor_email == email_usuario or autor_email in seguindo:
+                return 0 
+            if autor_email in conhecidos:
+                return 1  
+            return 2    
+
+        postagens = sorted(postagens, key=grupo_rede)
+
+        resultado = []
+        for p in postagens:
+            item = p.to_dict(email_usuario)
+            item['grupoRede'] = grupo_rede(p)
+            resultado.append(item)
+
+        return jsonify({'postagens': resultado}), 200
 
     def tags_tendencias(self):
         limite = request.args.get('limite', default=4, type=int)
@@ -44,7 +65,8 @@ class PostagemController:
         if not termo:
             return jsonify({'usuarios': [], 'tags': []}), 200
 
-        resultado = self.__dao_postagem.buscar_usuarios_e_tags(termo)
+        email_usuario = request.usuario_atual.get('email')
+        resultado = self.__dao_postagem.buscar_usuarios_e_tags(termo, email_usuario)
         return jsonify(resultado), 200
 
     def listar_todas(self):

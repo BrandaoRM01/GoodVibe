@@ -15,6 +15,8 @@ class UserController:
         self.__dao_usuario = UserDAO()
         self.__postagem_dao = PostagemDAO()
         self.__dao_historico_senha = HistoricoSenhaDAO()
+        self.__cache_estatisticas = None        
+        self.__cache_estatisticas_ate = 0         
 
     def __validar_email(self, email):
         try:
@@ -29,8 +31,20 @@ class UserController:
             return False
         return True
 
+    def __horas_do_token_atual(self):
+        try:
+            usuario = request.usuario_atual
+            return max((usuario['exp'] - usuario['iat']) / 3600, 1)
+        except (KeyError, TypeError):
+            return 24
+
     def me(self):
         usuario = dict(request.usuario_atual)
+        usuario_db = self.__dao_usuario.buscar_usuario_por_email(usuario['email'])
+        if usuario_db:
+
+            usuario['qtd_seguidores'] = usuario_db.qtd_seguidores
+            usuario['qtd_seguindo'] = usuario_db.qtd_seguindo
         usuario['qtd_postagens'] = self.__postagem_dao.contar_postagens_por_autor(usuario['email'])
         return jsonify({'usuario': usuario}), 200
 
@@ -117,7 +131,10 @@ class UserController:
             return jsonify({'erro': 'Usuário não encontrado. Por favor, verifique o email e tente novamente.'}), 404
 
         if check_password_hash(usuario.senha_hash, senha):
-            token = gerar_token(usuario.to_dict())
+            lembrar = request.form.get('lembrar') == 'true'
+            horas = 24 * 7 if lembrar else 24
+
+            token = gerar_token(usuario.to_dict(), expira_em_horas=horas)
             return jsonify({
                 'mensagem': f'Bem vindo, {usuario.username}!',
                 'token': token,
@@ -282,7 +299,7 @@ class UserController:
 
         self.__dao_usuario.editar_usuario(usuario_atualizado)
 
-        novo_token = gerar_token(usuario_atualizado.to_dict())
+        novo_token = gerar_token(usuario_atualizado.to_dict(), expira_em_horas=self.__horas_do_token_atual())
 
         usuario_dict = usuario_atualizado.to_dict()
         usuario_dict['qtd_postagens'] = self.__postagem_dao.contar_postagens_por_autor(email)
@@ -354,7 +371,7 @@ class UserController:
         historico = HistoricoSenha(usuario_atualizado, senha_hash_nova)
         self.__dao_historico_senha.inserir_nova_senha(historico)
 
-        novo_token = gerar_token(usuario_atualizado.to_dict())
+        novo_token = gerar_token(usuario_atualizado.to_dict(), expira_em_horas=self.__horas_do_token_atual())
 
         return jsonify({
             'mensagem': 'Senha alterada com sucesso!',
@@ -398,3 +415,12 @@ class UserController:
             'total': total,
             'proximoOffset': proximo_offset
         }), 200
+
+    def estatisticas_publicas(self):
+        agora = time.time()
+
+        if self.__cache_estatisticas is None or agora >= self.__cache_estatisticas_ate:
+            self.__cache_estatisticas = self.__dao_usuario.buscar_estatisticas_publicas()
+            self.__cache_estatisticas_ate = agora + 60
+
+        return jsonify(self.__cache_estatisticas), 200

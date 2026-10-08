@@ -3,6 +3,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useTagsTendencias } from "@/lib/use-postagens";
 import { useUsuariosDestaque } from "@/lib/use-usuarios";
 import { API_URL } from "@/lib/api";
+import { BotaoSeguir } from "@/components/BotaoSeguir";
 
 function formatarContagem(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
@@ -103,9 +104,7 @@ export function RightRail() {
                   </p>
                 </button>
 
-                <button className="text-xs font-semibold text-primary hover:underline shrink-0">
-                  Seguir
-                </button>
+                <BotaoSeguir email={u.email} />
               </div>
             );
           })}

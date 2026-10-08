@@ -21,7 +21,8 @@ export function useUsuarioAtual() {
 export function useLogin() {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ email, senha }: { email: string; senha: string }) => apiLogin(email, senha),
+        mutationFn: ({ email, senha, lembrar }: { email: string; senha: string; lembrar?: boolean }) =>
+            apiLogin(email, senha, lembrar),
         onSuccess: async () => {
             queryClient.removeQueries({
                 predicate: (q) => q.queryKey[0] !== "usuario-atual",

@@ -4,11 +4,22 @@ import { Hash, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { AvatarUsuario, PerfilUsuarioLink } from "@/components/UsuarioAdminUI";
 import { useBusca } from "@/lib/use-postagens";
+import { BotaoSeguir } from "@/components/BotaoSeguir";
+import { useUsuarioAtual } from "@/lib/use-auth";
 
 export function BuscaModal({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
     const navigate = useNavigate();
     const [texto, setTexto] = useState("");
     const [termo, setTermo] = useState("");
+
+    const { data: usuarioAtual } = useUsuarioAtual();
+
+    function rotuloRede(email: string, grupo: 0 | 1 | 2) {
+        if (email === usuarioAtual?.email) return " · Você";
+        if (grupo === 0) return " · Seguindo";
+        if (grupo === 1) return " · Talvez você conheça";
+        return "";
+    }
 
     useEffect(() => {
         const limpo = texto.trim().replace(/^[@#]+/, "").trim();
@@ -105,8 +116,10 @@ export function BuscaModal({ aberto, onFechar }: { aberto: boolean; onFechar: ()
                                         </p>
                                         <p className="text-xs text-muted-foreground">
                                             {u.totalPostagens} {u.totalPostagens === 1 ? "boa ação" : "boas ações"}
+                                            {rotuloRede(u.email, u.grupoRede)}
                                         </p>
                                     </button>
+                                    <BotaoSeguir email={u.email} />
                                 </div>
                             ))}
                         </section>

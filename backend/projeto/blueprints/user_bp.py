@@ -77,3 +77,7 @@ def resumo_admin():
 @moderador_required
 def ranking_usuarios():
     return controller.ranking_usuarios()
+
+@user_bp.route('/publico/estatisticas', methods=['GET'])
+def estatisticas_publicas():
+    return controller.estatisticas_publicas()

@@ -112,6 +112,19 @@ CREATE TABLE IF NOT EXISTS denuncias (
     INDEX idx_denuncias_criado_em (criado_em)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS seguidores (
+    seguidor_email VARCHAR(150) NOT NULL,
+    seguido_email VARCHAR(150) NOT NULL,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (seguidor_email, seguido_email),
+    FOREIGN KEY (seguidor_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+    FOREIGN KEY (seguido_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+
+    INDEX idx_seguidores_seguido (seguido_email, criado_em),
+    INDEX idx_seguidores_seguidor (seguidor_email, criado_em)
+) ENGINE=InnoDB;
+
 CREATE OR REPLACE VIEW vw_postagens AS
 SELECT
     p.id, p.conteudo, p.url_imagem, p.boa_acao,

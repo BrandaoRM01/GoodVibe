@@ -4,15 +4,21 @@ const TOKEN_KEY = "goodvibe_token";
 
 export function getToken(): string | null {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY) ?? localStorage.getItem(TOKEN_KEY);
 }
 
-export function setToken(token: string) {
-    localStorage.setItem(TOKEN_KEY, token);
+export function setToken(token: string, lembrar?: boolean) {
+    const manter = lembrar ?? localStorage.getItem(TOKEN_KEY) !== null;
+    const destino = manter ? localStorage : sessionStorage;
+    const outro = manter ? sessionStorage : localStorage;
+
+    destino.setItem(TOKEN_KEY, token);
+    outro.removeItem(TOKEN_KEY);
 }
 
 export function clearToken() {
     localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
 }
 
 export class ApiError extends Error {
@@ -64,13 +70,14 @@ export type Usuario = {
     localizacao: string | null;
 };
 
-export async function apiLogin(email: string, senha: string): Promise<Usuario> {
+export async function apiLogin(email: string, senha: string, lembrar = false): Promise<Usuario> {
     const formData = new FormData();
     formData.append("email", email);
     formData.append("senha", senha);
+    formData.append("lembrar", lembrar ? "true" : "false");
 
     const data = await request("/api/usuarios/login", { method: "POST", body: formData });
-    setToken(data.token);
+    setToken(data.token, lembrar);
     return data.usuario;
 }
 

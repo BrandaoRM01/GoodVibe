@@ -1,41 +1,92 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
-  Sparkles, Heart, Users, Trophy, Shield, MessageCircle,
-  ArrowRight, Star, Smile, Check,
+  Sparkles,
+  Heart,
+  Users,
+  Shield,
+  MessageCircle,
+  Share2,
+  ArrowRight,
+  Star,
+  Smile,
+  Check,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useEstatisticasPublicas } from "@/lib/use-estatisticas";
+import { formatarNumero, type EstatisticasPublicasAPI } from "@/lib/estatisticas";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GoodVib& — Rede social das boas ações e boas vibrações" },
-      { name: "description", content: "Uma rede social acolhedora focada em empatia, bem-estar e gentileza. Faça parte da GoodVib&." },
+      {
+        title: "GoodVib& — Rede social das boas ações e boas vibrações",
+      },
+      {
+        name: "description",
+        content:
+          "Uma rede social acolhedora focada em empatia, bem-estar e gentileza. Faça parte da GoodVib&.",
+      },
     ],
   }),
   component: Landing,
 });
 
 function Landing() {
+  const { data: est } = useEstatisticasPublicas();
+  const total = est?.totalUsuarios ?? 0;
+  const fraseComunidade =
+    total > 0
+      ? `${formatarNumero(total)} ${total === 1 ? "pessoa espalhando" : "pessoas espalhando"} boas vibrações`
+      : "Venha espalhar boas vibrações";
+
   return (
     <div className="min-h-screen">
       {/* Nav */}
       <header className="sticky top-0 z-50 glass border-b border-border">
         <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
           <Logo />
+
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">Recursos</a>
-            <a href="#community" className="hover:text-foreground transition-colors">Comunidade</a>
-            <a href="#preview" className="hover:text-foreground transition-colors">Preview</a>
+            <a
+              href="#features"
+              className="hover:text-foreground transition-colors"
+            >
+              Recursos
+            </a>
+
+            <a
+              href="#community"
+              className="hover:text-foreground transition-colors"
+            >
+              Comunidade
+            </a>
+
+            <a
+              href="#preview"
+              className="hover:text-foreground transition-colors"
+            >
+              Preview
+            </a>
           </nav>
+
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Link to="/login" className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full hover:bg-accent transition-colors">
+
+            <Link
+              to="/login"
+              className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full hover:bg-accent transition-colors"
+            >
               Entrar
             </Link>
-            <Link to="/signup" className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground text-sm font-semibold px-5 py-2.5 rounded-full shadow-soft hover:shadow-glow hover:scale-[1.03] transition-all">
-              Criar conta <ArrowRight className="h-4 w-4" />
+
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-1.5 gradient-primary text-primary-foreground text-sm font-semibold px-5 py-2.5 rounded-full shadow-soft hover:shadow-glow hover:scale-[1.03] transition-all"
+            >
+              Criar conta
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -50,35 +101,55 @@ function Landing() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-flex items-center gap-2 text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full mb-6">
-              <Sparkles className="h-3.5 w-3.5" /> Bem-vindo ao lado bom da internet
+              <Sparkles className="h-3.5 w-3.5" />
+              Bem-vindo ao lado bom da internet
             </span>
+
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">
-              Pequenas ações, <span className="gradient-text">grandes vibrações</span>.
+              Pequenas ações,{" "}
+              <span className="gradient-text">grandes vibrações</span>.
             </h1>
+
             <p className="mt-6 text-lg text-muted-foreground max-w-xl leading-relaxed">
-              GoodVib& é a rede social que celebra empatia, bem-estar e gentileza.
-              Compartilhe boas ações, inspire pessoas e construa uma comunidade
-              mais leve, junto com quem acredita em conexões verdadeiras.
+              GoodVib& é a rede social que celebra empatia, bem-estar e
+              gentileza. Compartilhe boas ações, inspire pessoas e encontre
+              novas conexões com a ajuda de uma IA feita para tornar sua
+              experiência mais acolhedora.
             </p>
+
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/signup" className="inline-flex items-center gap-2 gradient-primary text-primary-foreground font-semibold px-7 py-3.5 rounded-full shadow-glow hover:scale-[1.03] transition-transform">
-                Começar agora <ArrowRight className="h-4 w-4" />
+              <Link
+                to="/signup"
+                className="inline-flex items-center gap-2 gradient-primary text-primary-foreground font-semibold px-7 py-3.5 rounded-full shadow-glow hover:scale-[1.03] transition-transform"
+              >
+                Começar agora
+                <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/feed" className="inline-flex items-center gap-2 bg-card border border-border font-semibold px-7 py-3.5 rounded-full hover:bg-accent transition-colors">
+
+              <Link
+                to="/feed"
+                className="inline-flex items-center gap-2 bg-card border border-border font-semibold px-7 py-3.5 rounded-full hover:bg-accent transition-colors"
+              >
                 Ver demonstração
               </Link>
             </div>
+
             <div className="mt-10 flex items-center gap-6 text-sm text-muted-foreground">
               <div className="flex -space-x-2">
                 {["A", "M", "L", "S"].map((c, i) => (
-                  <div key={i} className="h-9 w-9 rounded-full gradient-primary border-2 border-background grid place-items-center text-primary-foreground font-bold text-xs">{c}</div>
+                  <div
+                    key={i}
+                    className="h-9 w-9 rounded-full gradient-primary border-2 border-background grid place-items-center text-primary-foreground font-bold text-xs"
+                  >
+                    {c}
+                  </div>
                 ))}
               </div>
+
               <div>
-                <div className="flex items-center gap-1 text-warning">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
-                </div>
-                <p className="mt-1">+120k pessoas espalhando boas vibrações</p>
+                <p className="mt-1">
+                  {fraseComunidade}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -91,14 +162,42 @@ function Landing() {
             className="relative"
           >
             <div className="absolute -inset-10 gradient-primary opacity-20 blur-3xl rounded-full" />
+
             <div className="relative rounded-[2rem] bg-card border border-border shadow-glow p-6 space-y-4">
-              <FloatingPost author="Marina Costa" handle="@marina" deed="Doou roupas para abrigo" content="Pequenos gestos transformam o dia inteiro de alguém. ✨" likes={284} delay={0.3} />
-              <FloatingPost author="Lucas Andrade" handle="@lucas.a" deed="Voluntariado" content="Hoje a gentileza apareceu nos olhos de quem ajudei." likes={156} delay={0.5} />
-              <div className="rounded-2xl gradient-primary p-5 text-primary-foreground flex items-center gap-3 shadow-soft">
-                <Trophy className="h-8 w-8" />
+              <FloatingPost
+                author="Marina Costa"
+                handle="@marina"
+                content="Hoje consegui ajudar uma pessoa que estava precisando. Às vezes, uma pequena atitude já transforma o dia de alguém. ✨"
+                tags={["gentileza", "boasações"]}
+                likes={284}
+                comments={18}
+                delay={0.3}
+              />
+
+              <FloatingPost
+                author="Lucas Andrade"
+                handle="@lucas.a"
+                content="Encontrar pessoas que compartilham os mesmos interesses torna tudo mais leve. 💙"
+                tags={["bemestar", "conexões"]}
+                likes={156}
+                comments={9}
+                delay={0.5}
+              />
+
+              <div className="rounded-2xl bg-primary/10 border border-primary/20 p-5 flex items-start gap-3">
+                <div className="h-10 w-10 rounded-full gradient-primary grid place-items-center text-primary-foreground shrink-0">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+
                 <div>
-                  <p className="font-bold text-sm">Você desbloqueou: Coração de Ouro</p>
-                  <p className="text-xs opacity-90">+250 XP por inspirar a comunidade</p>
+                  <p className="font-bold text-sm">
+                    Assistente GoodVib&
+                  </p>
+
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    Posso ajudar você a encontrar pessoas, descobrir
+                    conteúdos e conhecer novos perfis dentro da comunidade.
+                  </p>
                 </div>
               </div>
             </div>
@@ -111,10 +210,13 @@ function Landing() {
         <div className="max-w-7xl mx-auto px-5">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-              Uma rede pensada para <span className="gradient-text">o seu bem-estar</span>
+              Uma rede pensada para{" "}
+              <span className="gradient-text">o seu bem-estar</span>
             </h2>
+
             <p className="mt-4 text-muted-foreground text-lg">
-              Recursos desenhados para fortalecer comunidades saudáveis e celebrar pequenas atitudes que mudam vidas.
+              Recursos desenhados para fortalecer comunidades saudáveis,
+              facilitar conexões e celebrar pequenas atitudes que mudam vidas.
             </p>
           </div>
 
@@ -131,8 +233,14 @@ function Landing() {
                 <div className="h-12 w-12 rounded-2xl gradient-primary grid place-items-center text-primary-foreground mb-5 shadow-soft">
                   <f.icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-lg font-bold mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+
+                <h3 className="text-lg font-bold mb-2">
+                  {f.title}
+                </h3>
+
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {f.desc}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -144,32 +252,55 @@ function Landing() {
         <div className="max-w-7xl mx-auto px-5 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
-              Construa sua jornada de <span className="gradient-text">boas vibrações</span>
+              Encontre seu espaço na{" "}
+              <span className="gradient-text">GoodVib&</span>
             </h2>
+
             <p className="text-muted-foreground text-lg mb-8">
-              Ganhe XP, desbloqueie emblemas e veja seu impacto crescer com cada gesto positivo.
-              Aqui, evoluir significa espalhar luz.
+              A GoodVib& usa uma IA auxiliar para ajudar você a descobrir
+              pessoas, conteúdos e conversas que combinam com seus interesses,
+              tornando a experiência mais personalizada e acolhedora.
             </p>
+
             <ul className="space-y-3">
-              {["Sistema de gamificação com níveis e conquistas",
-                "Tags positivas e tendências que inspiram",
+              {[
+                "IA que ajuda você a descobrir novos perfis",
+                "Sugestões de conteúdos e pessoas",
                 "Moderação ativa para um espaço saudável",
-                "Mensagens privadas com bolhas elegantes"].map((t) => (
-                <li key={t} className="flex items-start gap-3">
+                "Mensagens privadas com bolhas elegantes",
+              ].map((t) => (
+                <li
+                  key={t}
+                  className="flex items-start gap-3"
+                >
                   <span className="mt-0.5 h-5 w-5 rounded-full gradient-primary grid place-items-center shrink-0">
-                    <Check className="h-3 w-3 text-primary-foreground" strokeWidth={3} />
+                    <Check
+                      className="h-3 w-3 text-primary-foreground"
+                      strokeWidth={3}
+                    />
                   </span>
+
                   <span className="text-sm">{t}</span>
                 </li>
               ))}
             </ul>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
-            {stats.map((s) => (
-              <div key={s.label} className="rounded-3xl bg-card border border-border p-6 shadow-soft">
+            {montarStats(est).map((s) => (
+              <div
+                key={s.label}
+                className="rounded-3xl bg-card border border-border p-6 shadow-soft"
+              >
                 <s.icon className="h-6 w-6 text-primary mb-3" />
-                <p className="text-3xl font-extrabold">{s.value}</p>
-                <p className="text-sm text-muted-foreground mt-1">{s.label}</p>
+
+                <p className="text-3xl font-extrabold">
+                  {s.value}
+                </p>
+
+                <p className="text-sm text-muted-foreground mt-1">
+                  {s.label}
+                </p>
               </div>
             ))}
           </div>
@@ -182,14 +313,26 @@ function Landing() {
           <div className="relative rounded-[2.5rem] gradient-primary p-12 sm:p-16 text-center text-primary-foreground overflow-hidden shadow-glow">
             <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
             <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+
+            <div className="relative mx-auto h-14 w-14 rounded-2xl bg-white/15 grid place-items-center mb-6">
+              <Sparkles className="h-7 w-7" />
+            </div>
+
             <h2 className="relative text-4xl sm:text-5xl font-bold tracking-tight">
-              Pronto para espalhar boas vibrações?
+              Pronto para encontrar novas conexões?
             </h2>
+
             <p className="relative mt-4 opacity-90 max-w-xl mx-auto">
-              Junte-se a uma comunidade que acredita em pessoas e celebra cada gesto de gentileza.
+              Junte-se a uma comunidade que acredita em pessoas, boas ações
+              e conexões verdadeiras — com uma IA pronta para ajudar você.
             </p>
-            <Link to="/signup" className="relative mt-8 inline-flex items-center gap-2 bg-white text-primary font-semibold px-8 py-3.5 rounded-full hover:scale-[1.03] transition-transform">
-              Criar minha conta <ArrowRight className="h-4 w-4" />
+
+            <Link
+              to="/signup"
+              className="relative mt-8 inline-flex items-center gap-2 bg-white text-primary font-semibold px-8 py-3.5 rounded-full hover:scale-[1.03] transition-transform"
+            >
+              Criar minha conta
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -199,11 +342,25 @@ function Landing() {
       <footer className="border-t border-border py-12">
         <div className="max-w-7xl mx-auto px-5 flex flex-col md:flex-row items-center justify-between gap-6">
           <Logo />
-          <p className="text-sm text-muted-foreground">© 2026 GoodVib&. Feito com <Heart className="inline h-3.5 w-3.5 text-primary fill-current" /> para inspirar boas ações.</p>
+
+          <p className="text-sm text-muted-foreground">
+            © 2026 GoodVib&. Feito com{" "}
+            <Heart className="inline h-3.5 w-3.5 text-primary fill-current" />{" "}
+            para inspirar boas ações.
+          </p>
+
           <div className="flex gap-5 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-foreground">Privacidade</a>
-            <a href="#" className="hover:text-foreground">Termos</a>
-            <a href="#" className="hover:text-foreground">Contato</a>
+            <a href="#" className="hover:text-foreground">
+              Privacidade
+            </a>
+
+            <a href="#" className="hover:text-foreground">
+              Termos
+            </a>
+
+            <a href="#" className="hover:text-foreground">
+              Contato
+            </a>
           </div>
         </div>
       </footer>
@@ -212,45 +369,144 @@ function Landing() {
 }
 
 const features = [
-  { icon: Heart, title: "Boas ações no centro", desc: "Marque suas postagens com gestos positivos e inspire outros a fazerem o mesmo." },
-  { icon: Trophy, title: "Gamificação leve", desc: "Acumule XP, suba de nível e desbloqueie emblemas conforme espalha gentileza." },
-  { icon: Shield, title: "Comunidade segura", desc: "Moderação ativa e ferramentas de cuidado para um ambiente respeitoso e acolhedor." },
-  { icon: MessageCircle, title: "Conversas elegantes", desc: "Mensagens privadas com design moderno e fluido, inspirado nos melhores apps." },
-  { icon: Users, title: "Tribo positiva", desc: "Encontre pessoas com vibrações parecidas e construa amizades reais." },
-  { icon: Smile, title: "Bem-estar diário", desc: "Tendências que inspiram, conteúdo curado e zero pressão por curtidas." },
+  {
+    icon: Heart,
+    title: "Boas ações no centro",
+    desc: "Marque suas postagens com gestos positivos e inspire outros a fazerem o mesmo.",
+  },
+  {
+    icon: Sparkles,
+    title: "Assistente inteligente",
+    desc: "Converse com a IA da GoodVib& para descobrir pessoas, encontrar conteúdos e receber sugestões personalizadas.",
+  },
+  {
+    icon: Shield,
+    title: "Comunidade segura",
+    desc: "Moderação ativa e ferramentas de cuidado para um ambiente respeitoso e acolhedor.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Conversas elegantes",
+    desc: "Mensagens privadas com design moderno e fluido, inspirado nos melhores apps.",
+  },
+  {
+    icon: Users,
+    title: "Tribo positiva",
+    desc: "Encontre pessoas com vibrações parecidas e construa amizades reais.",
+  },
+  {
+    icon: Smile,
+    title: "Bem-estar diário",
+    desc: "Tendências que inspiram, conteúdo curado e zero pressão por curtidas.",
+  },
 ];
 
-const stats = [
-  { icon: Users, value: "120k+", label: "Membros ativos" },
-  { icon: Heart, value: "2.3M", label: "Boas ações compartilhadas" },
-  { icon: Trophy, value: "48k", label: "Emblemas desbloqueados" },
-  { icon: Sparkles, value: "98%", label: "Sentem-se acolhidos" },
-];
+function montarStats(est?: EstatisticasPublicasAPI) {
+  const v = (n?: number) => (est ? formatarNumero(n ?? 0) : "—");
+  return [
+    {
+      icon: Users,
+      value: v(est?.totalUsuarios),
+      label: "Pessoas na comunidade",
+    },
+    {
+      icon: Heart,
+      value: v(est?.boasAcoesTotal),
+      label: "Boas ações compartilhadas",
+    },
+    {
+      icon: Sparkles,
+      value: v(est?.boasAcoesHoje),
+      label: est && est.boasAcoesHoje === 0 ? "Boas ações hoje — que tal começar a de hoje?" : "Boas ações hoje",
+    },
+    {
+      icon: Smile,
+      value: est ? `${est.engajamento}%` : "—",
+      label: "Da comunidade ativa este mês",
+    },
+  ];
+}
 
-function FloatingPost({ author, handle, deed, content, likes, delay = 0 }: {
-  author: string; handle: string; deed: string; content: string; likes: number; delay?: number;
+function FloatingPost({
+  author,
+  handle,
+  content,
+  tags,
+  likes,
+  comments,
+  delay = 0,
+}: {
+  author: string;
+  handle: string;
+  content: string;
+  tags: string[];
+  likes: number;
+  comments: number;
+  delay?: number;
 }) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay }}
-      className="rounded-2xl bg-background border border-border p-4 shadow-soft"
+      className="rounded-3xl bg-background border border-border p-5 shadow-soft"
     >
-      <div className="flex items-center gap-3 mb-2">
-        <div className="h-9 w-9 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold text-sm">{author[0]}</div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold truncate">{author}</p>
-          <p className="text-xs text-muted-foreground truncate">{handle}</p>
+      <header className="flex items-center gap-3">
+        <div className="h-11 w-11 rounded-full gradient-primary grid place-items-center text-primary-foreground font-bold shrink-0">
+          {author[0]}
         </div>
-        <span className="text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full whitespace-nowrap">
-          ✨ {deed}
-        </span>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <p className="font-semibold text-sm truncate">
+              {author}
+            </p>
+
+            <span className="text-xs text-muted-foreground">
+              ·
+            </span>
+
+            <span className="text-xs text-muted-foreground">
+              agora
+            </span>
+          </div>
+
+          <p className="text-xs text-muted-foreground truncate">
+            {handle}
+          </p>
+        </div>
+      </header>
+
+      <p className="mt-3 text-[15px] leading-relaxed">
+        {content}
+      </p>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {tags.map((tag) => (
+          <span
+            key={tag}
+            className="text-xs px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
+          >
+            #{tag}
+          </span>
+        ))}
       </div>
-      <p className="text-sm">{content}</p>
-      <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-        <Heart className="h-3.5 w-3.5 fill-primary text-primary" /> {likes}
-      </div>
+
+      <footer className="mt-4 pt-3 border-t border-border flex items-center gap-1 text-muted-foreground">
+        <div className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium">
+          <Heart className="h-4 w-4" />
+          {likes}
+        </div>
+
+        <div className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium">
+          <MessageCircle className="h-4 w-4" />
+          {comments}
+        </div>
+
+        <div className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium">
+          <Share2 className="h-4 w-4" />
+        </div>
+      </footer>
     </motion.div>
   );
 }

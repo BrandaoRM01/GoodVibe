@@ -20,6 +20,7 @@ import {
   type ComentarioAPI,
 } from "@/lib/comentarios";
 import { DenunciarModal } from "@/components/DenunciarModal";
+import { BotaoSeguir } from "@/components/BotaoSeguir";
 
 type ComentariosContexto = {
   postagemId: number;
@@ -493,6 +494,7 @@ function ComentarioItem({ comentario }: { comentario: ComentarioAPI }) {
                 Denunciar
               </button>
             )}
+            <BotaoSeguir email={comentario.authorEmail} variante="texto" />
           </div>
         </div>
 

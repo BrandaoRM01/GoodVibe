@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api";
 import { ComentariosModal } from "@/components/ComentariosModal";
 import { DenunciarModal } from "@/components/DenunciarModal";
+import { BotaoSeguir } from "@/components/BotaoSeguir";
 
 const MAX_TAGS_EDICAO = 5;
 
@@ -31,6 +32,7 @@ export type Post = {
   comments: number;
   shares: number;
   liked?: boolean;
+  grupoRede?: 0 | 1 | 2;
 };
 
 export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
@@ -241,8 +243,15 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
             </PerfilLink>
             <span className="text-xs text-muted-foreground">·</span>
             <span className="text-xs text-muted-foreground">{post.time}</span>
+            {post.grupoRede === 1 && (
+              <>
+                <span className="text-xs text-muted-foreground">·</span>
+                <span className="text-xs font-medium text-primary">Talvez você conheça</span>
+              </>
+            )}
           </div>
         </div>
+        <BotaoSeguir email={post.authorEmail} />
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuAberto((v) => !v)}

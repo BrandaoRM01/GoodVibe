@@ -5,7 +5,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { ProfileView, mapPostagemParaPost } from "@/components/ProfileView";
 import { useFeed } from "@/lib/use-postagens";
 import { useUsuarioAtual, useUsuarioPorEmail } from "@/lib/use-auth";
-import { UserPlus } from "lucide-react";
+import { BotaoSeguir } from "@/components/BotaoSeguir";
 import { RotaProtegida } from "@/components/RotaProtegida";
 
 export const Route = createFileRoute("/profile/$email")({
@@ -79,15 +79,7 @@ function PerfilPublicoConteudo() {
                     carregandoFeed={carregandoFeed}
                     abaAtiva={abaAtiva}
                     onMudarAba={setAbaAtiva}
-                    actions={
-                        <button
-                            disabled
-                            title="Em breve"
-                            className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-5 py-2.5 rounded-full text-sm shadow-glow opacity-60 cursor-not-allowed"
-                        >
-                            <UserPlus className="h-4 w-4" /> Seguir
-                        </button>
-                    }
+                    actions={<BotaoSeguir email={usuario.email} grande />}
                 />
             </main>
             <MobileNav />

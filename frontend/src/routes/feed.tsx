@@ -76,6 +76,7 @@ function mapearPostagem(p: PostagemAPI): Post {
     comments: p.comments,
     shares: p.shares,
     liked: p.curtidoPorMim,
+    grupoRede: p.grupoRede,
   };
 }
 
@@ -83,6 +84,8 @@ function FeedConteudo() {
   const { tag, autor, compose } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: postagens, isLoading, isError, error } = useFeed(tag, autor);
+  const gruposPresentes = new Set((postagens ?? []).map((p) => p.grupoRede ?? 2));
+  const mostrarTitulos = !autor && !(gruposPresentes.size === 1 && gruposPresentes.has(2));
   const [buscaAberta, setBuscaAberta] = useState(false);
 
   function limparTag() {

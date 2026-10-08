@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useLogin } from "@/lib/use-auth";
 import { ApiError } from "@/lib/api";
+import { useEstatisticasPublicas } from "@/lib/use-estatisticas";
+import { formatarNumero } from "@/lib/estatisticas";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar — GoodVib&" }] }),
@@ -16,6 +18,7 @@ function LoginPage() {
   const [showPwd, setShowPwd] = useState(false);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [lembrar, setLembrar] = useState(false);
   const navigate = useNavigate();
   const login = useLogin();
 
@@ -23,7 +26,7 @@ function LoginPage() {
     e.preventDefault();
 
     login.mutate(
-      { email, senha },
+      { email, senha, lembrar },
       {
         onSuccess: (usuario) => {
           toast.success(`Bem vindo, ${usuario.username}!`);
@@ -81,7 +84,12 @@ function LoginPage() {
         />
         <div className="flex items-center justify-between text-xs">
           <label className="flex items-center gap-2 text-muted-foreground">
-            <input type="checkbox" className="accent-[var(--color-primary)]" />
+            <input
+              type="checkbox"
+              checked={lembrar}
+              onChange={(e) => setLembrar(e.target.checked)}
+              className="accent-[var(--color-primary)]"
+            />
             Lembrar de mim
           </label>
           <a href="#" className="text-primary font-semibold hover:underline">
@@ -95,8 +103,6 @@ function LoginPage() {
         >
           {login.isPending ? "Entrando..." : "Entrar"} <ArrowRight className="h-4 w-4" />
         </button>
-        <Divider />
-        <SocialButtons />
       </form>
     </AuthLayout>
   );
@@ -113,26 +119,38 @@ export function AuthLayout({
   children: React.ReactNode;
   footer: React.ReactNode;
 }) {
+  const { data: est } = useEstatisticasPublicas();
+  const destaques = [
+    { valor: est ? formatarNumero(est.totalUsuarios) : "—", rotulo: "pessoas na comunidade" },
+    { valor: est ? formatarNumero(est.boasAcoesTotal) : "—", rotulo: "boas ações compartilhadas" },
+    { valor: est ? `${est.engajamento}%` : "—", rotulo: "ativos este mês" },
+  ];
+
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* Visual side */}
-      <div className="hidden lg:flex relative overflow-hidden gradient-primary text-primary-foreground p-12 flex-col justify-between">
-        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-white/15 blur-3xl" />
-        <div className="absolute -bottom-32 -right-24 h-96 w-96 rounded-full bg-white/15 blur-3xl" />
-        <Logo />
+      <div className="hidden lg:flex relative overflow-hidden bg-primary/15 text-foreground p-12 flex-col justify-between">
+        <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute -bottom-32 -right-24 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="relative">
+          <Logo />
+        </div>
         <div className="relative">
           <h2 className="text-4xl font-bold leading-tight max-w-md">
             "Aqui me sinto livre pra ser gentil sem medo."
           </h2>
-          <p className="mt-4 opacity-90">— Marina, membro desde 2024</p>
+          <p className="mt-4 text-muted-foreground">— Marina, membro desde 2024</p>
         </div>
         <div className="relative grid grid-cols-3 gap-3 max-w-sm">
-          {["120k+ membros", "2.3M boas ações", "98% acolhidos"].map((t) => (
+          {destaques.map((d) => (
             <div
-              key={t}
-              className="rounded-2xl bg-white/15 backdrop-blur p-3 text-xs font-semibold text-center"
+              key={d.rotulo}
+              className="rounded-2xl bg-card/60 backdrop-blur p-3 text-center"
             >
-              {t}
+              <p className="text-xl font-extrabold">{d.valor}</p>
+              <p className="text-[11px] font-medium text-muted-foreground leading-tight mt-0.5">
+                {d.rotulo}
+              </p>
             </div>
           ))}
         </div>
@@ -181,33 +199,5 @@ export function Field({
         {rightIcon && <span className="absolute right-4">{rightIcon}</span>}
       </div>
     </label>
-  );
-}
-
-function Divider() {
-  return (
-    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-      <div className="h-px bg-border flex-1" /> ou continue com{" "}
-      <div className="h-px bg-border flex-1" />
-    </div>
-  );
-}
-
-function SocialButtons() {
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      <button
-        type="button"
-        className="bg-card border border-border rounded-2xl py-3 text-sm font-semibold hover:bg-accent transition-colors"
-      >
-        Google
-      </button>
-      <button
-        type="button"
-        className="bg-card border border-border rounded-2xl py-3 text-sm font-semibold hover:bg-accent transition-colors"
-      >
-        Apple
-      </button>
-    </div>
   );
 }

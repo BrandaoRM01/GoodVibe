@@ -16,6 +16,7 @@ export interface PostagemAPI {
     goodDeed: string | null;
     status: "pendente" | "aprovado" | "reprovado";
     curtidoPorMim: boolean;
+    grupoRede?: 0 | 1 | 2;
 }
 
 interface FeedResponse {
@@ -70,6 +71,7 @@ export interface BuscaUsuarioAPI {
     username: string;
     url_foto: string | null;
     totalPostagens: number;
+    grupoRede: 0 | 1 | 2;
 }
 
 export interface BuscaTagAPI {

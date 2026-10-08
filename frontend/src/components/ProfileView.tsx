@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Calendar, Heart, Sparkles } from "lucide-react";
 import { PostCard, type Post } from "@/components/PostCard";
 import { API_URL, type Usuario } from "@/lib/api";
 import type { PostagemAPI } from "@/lib/postagens";
+import { SeguidoresModal } from "@/components/SeguidoresModal";
+import type { TipoRede } from "@/lib/seguidores";
 
 export function formatarDataPost(dataStr: string | null): string {
     if (!dataStr) return "";
@@ -30,6 +32,7 @@ export function mapPostagemParaPost(p: PostagemAPI): Post {
     return {
         id: String(p.id),
         author: p.author,
+        authorEmail: p.authorEmail,
         handle: p.handle,
         avatar: p.author?.[0]?.toUpperCase() ?? "?",
         avatarFotoUrl: p.avatarUrl ? `${API_URL}/${p.avatarUrl}` : undefined,
@@ -72,6 +75,20 @@ export function ProfileView({
     actions,
 }: ProfileViewProps) {
     const inicial = usuario.username?.[0]?.toUpperCase() ?? "?";
+
+    const [redeAberta, setRedeAberta] = useState(false);
+    const [redeAba, setRedeAba] = useState<TipoRede>("seguidores");
+
+    function abrirRede(aba: TipoRede) {
+        setRedeAba(aba);
+        setRedeAberta(true);
+    }
+
+    const stats: { label: string; value: string; icon: typeof Heart; aba?: TipoRede }[] = [
+        { label: "Boas ações", value: String(usuario.qtd_postagens), icon: Heart },
+        { label: "Seguidores", value: String(usuario.qtd_seguidores), icon: Sparkles, aba: "seguidores" },
+        { label: "Seguindo", value: String(usuario.qtd_seguindo), icon: Sparkles, aba: "seguindo" },
+    ];
 
     return (
         <>
@@ -131,17 +148,31 @@ export function ProfileView({
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {[
-                        { label: "Boas ações", value: String(usuario.qtd_postagens), icon: Heart },
-                        { label: "Seguidores", value: String(usuario.qtd_seguidores), icon: Sparkles },
-                        { label: "Seguindo", value: String(usuario.qtd_seguindo), icon: Sparkles },
-                    ].map((s) => (
-                        <div key={s.label} className="rounded-2xl bg-card border border-border p-4 shadow-soft">
-                            <s.icon className="h-4 w-4 text-primary mb-1.5" />
-                            <p className="text-2xl font-extrabold">{s.value}</p>
-                            <p className="text-xs text-muted-foreground">{s.label}</p>
-                        </div>
-                    ))}
+                    {stats.map((s) => {
+                        const base = "rounded-2xl bg-card border border-border p-4 shadow-soft";
+                        const conteudo = (
+                            <>
+                                <s.icon className="h-4 w-4 text-primary mb-1.5" />
+                                <p className="text-2xl font-extrabold">{s.value}</p>
+                                <p className="text-xs text-muted-foreground">{s.label}</p>
+                            </>
+                        );
+
+                        return s.aba ? (
+                            <button
+                                key={s.label}
+                                type="button"
+                                onClick={() => abrirRede(s.aba!)}
+                                className={`${base} text-left hover:bg-accent hover:border-primary/40 transition-colors`}
+                            >
+                                {conteudo}
+                            </button>
+                        ) : (
+                            <div key={s.label} className={base}>
+                                {conteudo}
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className="mt-8 grid grid-cols-2 gap-3">
@@ -201,6 +232,16 @@ export function ProfileView({
                     )}
                 </motion.div>
             </div>
+            <SeguidoresModal
+                email={usuario.email}
+                username={usuario.username}
+                aberto={redeAberta}
+                aba={redeAba}
+                onMudarAba={setRedeAba}
+                onFechar={() => setRedeAberta(false)}
+                qtdSeguidores={usuario.qtd_seguidores}
+                qtdSeguindo={usuario.qtd_seguindo}
+            />
         </>
     );
 }
