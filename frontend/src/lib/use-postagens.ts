@@ -7,9 +7,11 @@ import {
   apiDescurtirPostagem,
   apiExcluirPostagem,
   apiSugestoesTags,
+  apiBuscar,
   type PostagemAPI,
   type CriarPostagemPayload,
   type TagSugestaoAPI,
+  type ResultadoBuscaAPI,
   apiTagsTendencias,
   TagTendenciaAPI,
   apiEditarPostagem,
@@ -22,6 +24,15 @@ export function useSugestoesTags(termo: string) {
     queryKey: ["tags-sugestoes", termo],
     queryFn: () => apiSugestoesTags(termo),
     enabled: termo.trim().length >= 2, // só busca a partir de 2 caracteres
+    staleTime: 30 * 1000,
+  });
+}
+
+export function useBusca(termo: string) {
+  return useQuery<ResultadoBuscaAPI>({
+    queryKey: ["busca", termo],
+    queryFn: () => apiBuscar(termo),
+    enabled: termo.trim().length >= 1,
     staleTime: 30 * 1000,
   });
 }

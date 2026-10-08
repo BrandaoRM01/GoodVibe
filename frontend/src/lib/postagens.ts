@@ -65,6 +65,32 @@ export async function apiSugestoesTags(termo: string): Promise<TagSugestaoAPI[]>
     return data.sugestoes;
 }
 
+export interface BuscaUsuarioAPI {
+    email: string;
+    username: string;
+    url_foto: string | null;
+    totalPostagens: number;
+}
+
+export interface BuscaTagAPI {
+    id: number;
+    nome: string;
+    totalPostagens: number;
+}
+
+export interface ResultadoBuscaAPI {
+    usuarios: BuscaUsuarioAPI[];
+    tags: BuscaTagAPI[];
+}
+
+export async function apiBuscar(termo: string): Promise<ResultadoBuscaAPI> {
+    if (!termo.trim()) return { usuarios: [], tags: [] };
+    const data: ResultadoBuscaAPI = await request(
+        `/api/postagens/busca?termo=${encodeURIComponent(termo.trim())}`
+    );
+    return data;
+}
+
 export async function apiCurtirPostagem(id: number): Promise<{ mensagem: string }> {
     return request(`/api/postagens/${id}/curtir`, { method: "POST" });
 }

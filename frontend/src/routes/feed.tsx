@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/AppSidebar";
 import { MobileNav } from "@/components/MobileNav";
@@ -5,6 +6,7 @@ import { RightRail } from "@/components/RightRail";
 import { Composer } from "@/components/Composer";
 import { PostCard, type Post } from "@/components/PostCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BuscaModal } from "@/components/BuscaModal";
 import { Search, Bell } from "lucide-react";
 import { useFeed } from "@/lib/use-postagens";
 import type { PostagemAPI } from "@/lib/postagens";
@@ -81,6 +83,7 @@ function FeedConteudo() {
   const { tag, autor, compose } = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: postagens, isLoading, isError, error } = useFeed(tag, autor);
+  const [buscaAberta, setBuscaAberta] = useState(false);
 
   function limparTag() {
     navigate({ search: (prev) => ({ ...prev, tag: undefined }) });
@@ -100,7 +103,12 @@ function FeedConteudo() {
       <main className="flex-1 min-w-0 max-w-2xl mx-auto px-4 sm:px-6 py-6">
         <header className="sticky top-0 z-40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-4 glass border-b border-border flex items-center gap-3">
           <h1 className="text-xl font-bold tracking-tight flex-1">Feed</h1>
-          <button className="h-10 w-10 rounded-full border border-border bg-card hover:bg-accent grid place-items-center transition-colors">
+          <button
+            type="button"
+            onClick={() => setBuscaAberta(true)}
+            aria-label="Buscar"
+            className="h-10 w-10 rounded-full border border-border bg-card hover:bg-accent grid place-items-center transition-colors"
+          >
             <Search className="h-4 w-4" />
           </button>
           <button className="h-10 w-10 rounded-full border border-border bg-card hover:bg-accent grid place-items-center transition-colors relative">
@@ -145,6 +153,7 @@ function FeedConteudo() {
       </main>
       <MobileNav />
       <RightRail />
+      <BuscaModal aberto={buscaAberta} onFechar={() => setBuscaAberta(false)} />
     </div>
   );
 }

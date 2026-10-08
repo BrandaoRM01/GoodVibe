@@ -61,3 +61,8 @@ def moderar_postagem(id_postagem):
 @token_required
 def sugestoes_tags():
     return controller.sugestoes_tags()
+
+@postagem_bp.route('/busca', methods=['GET'])
+@token_required
+def busca():
+    return controller.buscar()

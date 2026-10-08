@@ -70,6 +70,43 @@ class PostagemDAO(BaseDAO):
         sql += " ORDER BY criado_em DESC"
         return self.__montar_postagens(sql, valores)
 
+    def buscar_usuarios_e_tags(self, termo, limite=6):
+        escapado = termo.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        contem = f"%{escapado}%"
+        comeca = f"{escapado}%"
+
+        sql_usuarios = """
+            SELECT u.email, u.username, u.url_foto,
+                   (SELECT COUNT(*) FROM postagens p
+                    WHERE p.autor_email = u.email AND p.status = 'aprovado') AS totalPostagens
+            FROM usuarios u
+            WHERE u.username LIKE %s
+            ORDER BY (u.username LIKE %s) DESC, totalPostagens DESC, u.username ASC
+            LIMIT %s
+        """
+        sql_tags = """
+            SELECT t.id, t.nome, COUNT(p.id) AS totalPostagens
+            FROM tags t
+            INNER JOIN postagens_tags pt ON pt.tag_id = t.id
+            INNER JOIN postagens p ON p.id = pt.postagem_id AND p.status = 'aprovado'
+            WHERE t.nome LIKE %s
+            GROUP BY t.id, t.nome
+            ORDER BY (t.nome LIKE %s) DESC, totalPostagens DESC, t.nome ASC
+            LIMIT %s
+        """
+
+        conexao = self._get_connection()
+        cursor = conexao.cursor(dictionary=True)
+        try:
+            cursor.execute(sql_usuarios, [contem, comeca, limite])
+            usuarios = cursor.fetchall()
+            cursor.execute(sql_tags, [contem, comeca, limite])
+            tags = cursor.fetchall()
+            return {'usuarios': usuarios, 'tags': tags}
+        finally:
+            cursor.close()
+            conexao.close()
+
     def buscar_tags_tendencias(self, limite=4):
         sql = """
             SELECT t.id, t.nome, COUNT(*) AS totalPostagens

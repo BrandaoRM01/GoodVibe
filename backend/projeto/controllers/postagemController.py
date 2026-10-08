@@ -39,6 +39,14 @@ class PostagemController:
         tendencias = self.__dao_postagem.buscar_tags_tendencias(limite)
         return jsonify({'tendencias': tendencias}), 200
 
+    def buscar(self):
+        termo = request.args.get('termo', '').strip().lstrip('@#').strip()[:50]
+        if not termo:
+            return jsonify({'usuarios': [], 'tags': []}), 200
+
+        resultado = self.__dao_postagem.buscar_usuarios_e_tags(termo)
+        return jsonify(resultado), 200
+
     def listar_todas(self):
         postagens = self.__dao_postagem.listar_todas()
         return jsonify({'postagens': [p.to_dict() for p in postagens]}), 200
