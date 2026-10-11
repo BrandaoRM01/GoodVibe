@@ -139,7 +139,7 @@ export function AuthLayout({
           <h2 className="text-4xl font-bold leading-tight max-w-md">
             "Aqui me sinto livre pra ser gentil sem medo."
           </h2>
-          <p className="mt-4 text-muted-foreground">— Marina, membro desde 2024</p>
+          <p className="mt-4 text-muted-foreground">— Giovanna, membro desde 2026</p>
         </div>
         <div className="relative grid grid-cols-3 gap-3 max-w-sm">
           {destaques.map((d) => (

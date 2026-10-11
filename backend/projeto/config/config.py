@@ -38,3 +38,7 @@ class Config:
 
     BREVO_CONFIG = sib_api_v3_sdk.Configuration()
     BREVO_CONFIG.api_key['api-key'] = BREVO_API_KEY
+
+    # Configurações API Gemini (Assistente de IA)
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    GEMINI_MODEL = os.getenv('GEMINI_MODEL') or 'gemini-3.5-flash-lite'

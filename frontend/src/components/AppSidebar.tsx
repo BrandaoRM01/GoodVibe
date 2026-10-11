@@ -1,6 +1,6 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import {
-  Home, Compass, MessageCircle, Bell, User, Settings, Sparkles, Heart, ShieldCheck,
+  Home, Compass, MessageCircle, Bell, User, Settings, Sparkles, Heart, ShieldCheck, Bot,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useUsuarioAtual } from "@/lib/use-auth";
@@ -10,6 +10,7 @@ const items = [
   { to: "/feed", label: "Início", icon: Home },
   { to: "/feed", label: "Explorar", icon: Compass },
   { to: "/messages", label: "Mensagens", icon: MessageCircle },
+  { to: "/assistente", label: "Assistente de IA", icon: Bot },
   { to: "/feed", label: "Notificações", icon: Bell },
   { to: "/profile", label: "Perfil", icon: User },
   { to: "/admin", label: "Painel", icon: ShieldCheck, somenteAdmin: true },
@@ -23,8 +24,8 @@ export function AppSidebar() {
   const itensVisiveis = items.filter((it) => !it.somenteAdmin || ehAdmin(usuario));
 
   return (
-    <aside className="hidden md:flex sticky top-0 h-screen w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-6">
-      <Link to="/feed" className="flex items-center gap-2.5 px-2 mb-4 justify-center lg:justify-start">
+    <aside className="hidden md:flex sticky top-0 h-dvh overflow-hidden w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-4">
+      <Link to="/feed" className="flex items-center gap-2.5 px-2 mb-2 justify-center lg:justify-start shrink-0">
         <div className="h-10 w-10 rounded-2xl gradient-primary grid place-items-center shadow-glow shrink-0">
           <Sparkles className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
         </div>
@@ -33,7 +34,7 @@ export function AppSidebar() {
         </span>
       </Link>
 
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1 flex-1 min-h-0 overflow-y-auto scrollbar-thin">
         {itensVisiveis.map((it, i) => {
           const active = path === it.to && i === 0 ? true : path.startsWith(it.to) && it.to !== "/feed";
           const isActive = path === it.to;
@@ -42,7 +43,7 @@ export function AppSidebar() {
               key={it.label + i}
               to={it.to}
               title={it.label}
-              className={`group relative flex items-center gap-3 px-3 lg:px-4 py-3 rounded-2xl transition-all justify-center lg:justify-start ${isActive
+              className={`group relative flex items-center gap-3 px-3 lg:px-4 py-2.5 rounded-2xl transition-all justify-center lg:justify-start shrink-0 ${isActive
                 ? "bg-primary/10 text-primary font-semibold"
                 : "text-foreground/70 hover:text-foreground hover:bg-accent"
                 }`}
@@ -61,9 +62,11 @@ export function AppSidebar() {
         })}
       </nav>
 
-      <div className="hidden lg:block mt-auto rounded-3xl p-5 gradient-primary text-primary-foreground shadow-glow">
-        <Heart className="h-5 w-5 mb-2" />
-        <p className="text-sm font-semibold leading-snug mb-3">Espalhe boas vibrações hoje</p>
+      <div className="hidden lg:block shrink-0 rounded-3xl p-4 gradient-primary text-primary-foreground shadow-glow">
+        <Heart className="h-5 w-5 mb-2 [@media(max-height:760px)]:mb-1.5" />
+        <p className="text-sm font-semibold leading-snug mb-3 [@media(max-height:760px)]:hidden">
+          Espalhe boas vibrações hoje
+        </p>
         <button
           onClick={() => navigate({ to: "/feed", search: { compose: true } })}
           className="w-full bg-white/20 hover:bg-white/30 transition-colors text-xs font-medium rounded-full py-2"

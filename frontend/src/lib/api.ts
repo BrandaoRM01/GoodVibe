@@ -1,3 +1,5 @@
+import { limparConversaAssistente } from "@/lib/conversaAssistente";
+
 export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
 
 const TOKEN_KEY = "goodvibe_token";
@@ -19,6 +21,7 @@ export function setToken(token: string, lembrar?: boolean) {
 export function clearToken() {
     localStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
+    limparConversaAssistente();
 }
 
 export class ApiError extends Error {
@@ -77,6 +80,7 @@ export async function apiLogin(email: string, senha: string, lembrar = false): P
     formData.append("lembrar", lembrar ? "true" : "false");
 
     const data = await request("/api/usuarios/login", { method: "POST", body: formData });
+    limparConversaAssistente();
     setToken(data.token, lembrar);
     return data.usuario;
 }

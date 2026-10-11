@@ -11,6 +11,7 @@ import { EditProfile } from "@/components/EditProfile";
 import { API_URL, ApiError } from "@/lib/api";
 import { toast } from "sonner";
 import { RotaProtegida } from "@/components/RotaProtegida";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export const Route = createFileRoute("/profile/")({
   head: () => ({ meta: [{ title: "Perfil — GoodVib&" }] }),
@@ -140,7 +141,7 @@ function ProfileConteudo() {
               >
                 <Settings className="h-4 w-4" /> Editar perfil
               </button>
-
+              <ThemeToggle />
               <div className="relative">
                 <button
                   onClick={() => setMenuAberto((v) => !v)}

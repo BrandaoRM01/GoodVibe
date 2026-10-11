@@ -3,3 +3,4 @@ from .postagemController import PostagemController
 from .comentarioController import ComentarioController
 from .denunciaController import DenunciaController
 from .seguidorController import SeguidorController
+from .assistenteController import AssistenteController

@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, MessageCircle, User, ShieldCheck, Compass } from "lucide-react";
+import { Home, MessageCircle, User, ShieldCheck, Compass, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 import { useUsuarioAtual } from "@/lib/use-auth";
 import { ehAdmin } from "@/components/RotaProtegida";
@@ -8,6 +8,7 @@ const items = [
   { to: "/feed", label: "Início", icon: Home },
   { to: "/feed", label: "Explorar", icon: Compass },
   { to: "/messages", label: "Chat", icon: MessageCircle },
+  { to: "/assistente", label: "Assistente", icon: Bot },
   { to: "/profile", label: "Perfil", icon: User },
   { to: "/admin", label: "Painel", icon: ShieldCheck, somenteAdmin: true },
 ];
@@ -26,7 +27,7 @@ export function MobileNav() {
             <li key={it.label + i}>
               <Link
                 to={it.to}
-                className={`relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-colors ${isActive ? "text-primary" : "text-muted-foreground"
+                className={`relative flex flex-col items-center gap-0.5 ${itensVisiveis.length > 5 ? "px-2" : "px-3"} py-1.5 rounded-2xl transition-colors ${isActive ? "text-primary" : "text-muted-foreground"
                   }`}
               >
                 {isActive && (

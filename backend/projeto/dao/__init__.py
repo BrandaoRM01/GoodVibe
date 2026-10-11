@@ -20,3 +20,4 @@ from .historicoSenhaDAO import HistoricoSenhaDAO
 from .comentarioDAO import ComentarioDAO
 from .denunciaDAO import DenunciaDAO
 from .seguidorDAO import SeguidorDAO
+from .assistenteDAO import AssistenteDAO
