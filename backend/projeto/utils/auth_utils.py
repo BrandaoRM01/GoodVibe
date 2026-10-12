@@ -4,9 +4,13 @@ from functools import wraps
 from flask import request, jsonify, current_app
 from projeto.dao import UserDAO
 
+# Nunca devem ir dentro do token, que o navegador consegue ler
+_CAMPOS_SENSIVEIS = ('senha_hash', 'token_recuperacao', 'token_expiracao')
+
 def gerar_token(usuario_dict, expira_em_horas=24):
+    dados = {k: v for k, v in usuario_dict.items() if k not in _CAMPOS_SENSIVEIS}
     payload = {
-        **usuario_dict,
+        **dados,
         'exp': datetime.now(timezone.utc) + timedelta(hours=expira_em_horas),
         'iat': datetime.now(timezone.utc),
     }

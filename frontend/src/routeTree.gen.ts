@@ -10,9 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as RedefinirSenhaRouteImport } from './routes/redefinir-senha'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedRouteImport } from './routes/feed'
+import { Route as EsqueciSenhaRouteImport } from './routes/esqueci-senha'
 import { Route as AssistenteRouteImport } from './routes/assistente'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -22,6 +24,11 @@ import { Route as ProfileEmailRouteImport } from './routes/profile.$email'
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RedefinirSenhaRoute = RedefinirSenhaRouteImport.update({
+  id: '/redefinir-senha',
+  path: '/redefinir-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesRoute = MessagesRouteImport.update({
@@ -37,6 +44,11 @@ const LoginRoute = LoginRouteImport.update({
 const FeedRoute = FeedRouteImport.update({
   id: '/feed',
   path: '/feed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsqueciSenhaRoute = EsqueciSenhaRouteImport.update({
+  id: '/esqueci-senha',
+  path: '/esqueci-senha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssistenteRoute = AssistenteRouteImport.update({
@@ -69,9 +81,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/assistente': typeof AssistenteRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
   '/profile/$email': typeof ProfileEmailRoute
   '/profile/': typeof ProfileIndexRoute
@@ -80,9 +94,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/assistente': typeof AssistenteRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
   '/profile/$email': typeof ProfileEmailRoute
   '/profile': typeof ProfileIndexRoute
@@ -92,9 +108,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/assistente': typeof AssistenteRoute
+  '/esqueci-senha': typeof EsqueciSenhaRoute
   '/feed': typeof FeedRoute
   '/login': typeof LoginRoute
   '/messages': typeof MessagesRoute
+  '/redefinir-senha': typeof RedefinirSenhaRoute
   '/signup': typeof SignupRoute
   '/profile/$email': typeof ProfileEmailRoute
   '/profile/': typeof ProfileIndexRoute
@@ -105,9 +123,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/assistente'
+    | '/esqueci-senha'
     | '/feed'
     | '/login'
     | '/messages'
+    | '/redefinir-senha'
     | '/signup'
     | '/profile/$email'
     | '/profile/'
@@ -116,9 +136,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/assistente'
+    | '/esqueci-senha'
     | '/feed'
     | '/login'
     | '/messages'
+    | '/redefinir-senha'
     | '/signup'
     | '/profile/$email'
     | '/profile'
@@ -127,9 +149,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/assistente'
+    | '/esqueci-senha'
     | '/feed'
     | '/login'
     | '/messages'
+    | '/redefinir-senha'
     | '/signup'
     | '/profile/$email'
     | '/profile/'
@@ -139,9 +163,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AssistenteRoute: typeof AssistenteRoute
+  EsqueciSenhaRoute: typeof EsqueciSenhaRoute
   FeedRoute: typeof FeedRoute
   LoginRoute: typeof LoginRoute
   MessagesRoute: typeof MessagesRoute
+  RedefinirSenhaRoute: typeof RedefinirSenhaRoute
   SignupRoute: typeof SignupRoute
   ProfileEmailRoute: typeof ProfileEmailRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
@@ -154,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redefinir-senha': {
+      id: '/redefinir-senha'
+      path: '/redefinir-senha'
+      fullPath: '/redefinir-senha'
+      preLoaderRoute: typeof RedefinirSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages': {
@@ -175,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/feed'
       fullPath: '/feed'
       preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/esqueci-senha': {
+      id: '/esqueci-senha'
+      path: '/esqueci-senha'
+      fullPath: '/esqueci-senha'
+      preLoaderRoute: typeof EsqueciSenhaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/assistente': {
@@ -219,9 +259,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AssistenteRoute: AssistenteRoute,
+  EsqueciSenhaRoute: EsqueciSenhaRoute,
   FeedRoute: FeedRoute,
   LoginRoute: LoginRoute,
   MessagesRoute: MessagesRoute,
+  RedefinirSenhaRoute: RedefinirSenhaRoute,
   SignupRoute: SignupRoute,
   ProfileEmailRoute: ProfileEmailRoute,
   ProfileIndexRoute: ProfileIndexRoute,

@@ -6,3 +6,4 @@ from .seguidorController import SeguidorController
 from .assistenteController import AssistenteController
 from .mensagemController import MensagemController
 from .notificacaoController import NotificacaoController
+from .recuperacaoSenhaController import RecuperacaoSenhaController

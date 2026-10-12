@@ -30,7 +30,7 @@ def create_app():
 
     from projeto.blueprints import (
         user_bp, postagem_bp, comentario_bp, denuncia_bp, seguidor_bp, assistente_bp,
-        mensagem_bp, notificacao_bp
+        mensagem_bp, notificacao_bp, recuperacao_senha_bp
     )
     app.register_blueprint(user_bp)
     app.register_blueprint(postagem_bp)
@@ -40,6 +40,7 @@ def create_app():
     app.register_blueprint(assistente_bp)
     app.register_blueprint(mensagem_bp)
     app.register_blueprint(notificacao_bp)
+    app.register_blueprint(recuperacao_senha_bp)
 
     @app.route('/uploads/<path:subpath>')
     def servir_uploads(subpath):

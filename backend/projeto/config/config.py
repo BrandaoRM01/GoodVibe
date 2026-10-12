@@ -39,6 +39,11 @@ class Config:
     BREVO_CONFIG = sib_api_v3_sdk.Configuration()
     BREVO_CONFIG.api_key['api-key'] = BREVO_API_KEY
 
+    BREVO_SENDER_EMAIL = os.getenv('BREVO_SENDER_EMAIL')
+    BREVO_SENDER_NAME = os.getenv('BREVO_SENDER_NAME') or 'GoodVib&'
+
+    FRONTEND_URL = (os.getenv('FRONTEND_URL') or 'http://localhost:8080').rstrip('/')
+
     # Configurações API Gemini (Assistente de IA)
     GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
     GEMINI_MODEL = os.getenv('GEMINI_MODEL') or 'gemini-3.5-flash-lite'

@@ -92,9 +92,9 @@ function LoginPage() {
             />
             Lembrar de mim
           </label>
-          <a href="#" className="text-primary font-semibold hover:underline">
+          <Link to="/esqueci-senha" className="text-primary font-semibold hover:underline">
             Esqueci a senha
-          </a>
+          </Link>
         </div>
         <button
           type="submit"
