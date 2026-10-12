@@ -4,3 +4,5 @@ from .comentario_bp import comentario_bp
 from .denuncia_bp import denuncia_bp
 from .seguidor_bp import seguidor_bp
 from .assistente_bp import assistente_bp
+from .mensagem_bp import mensagem_bp
+from .notificacao_bp import notificacao_bp

@@ -1,6 +1,7 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from mysql.connector.errors import IntegrityError
-from projeto.dao import DenunciaDAO, PostagemDAO, ComentarioDAO
+from projeto.dao import DenunciaDAO, PostagemDAO, ComentarioDAO, NotificacaoDAO
+from projeto.realtime import emitir_para_usuario
 
 MOTIVOS = {
     'spam': 'Spam ou conteúdo repetitivo',
@@ -20,11 +21,19 @@ class DenunciaController:
         self.__dao_denuncia = DenunciaDAO()
         self.__dao_postagem = PostagemDAO()
         self.__dao_comentario = ComentarioDAO()
+        self.__dao_notificacao = NotificacaoDAO()
+
+    def __notificar_admins(self, tipo, alvo_id, denunciante_email):
+        try:
+            criadas = self.__dao_notificacao.registrar_denuncia(denunciante_email, tipo, alvo_id)
+            for admin_email, notificacao in criadas:
+                emitir_para_usuario(admin_email, 'notificacao:nova', {'notificacao': notificacao})
+        except Exception:
+            current_app.logger.exception('Falha ao notificar administradores sobre a denúncia')
 
     def criar_denuncia(self):
         usuario = request.usuario_atual
 
-        # admins têm a ação de excluir direto, então não denunciam
         if usuario.get('pode_moderar') or usuario.get('pode_gerenciar_usuarios'):
             return jsonify({'erro': 'Administradores não podem fazer denúncias.'}), 403
 
@@ -61,6 +70,8 @@ class DenunciaController:
         except IntegrityError:
             return jsonify({'erro': 'Você já denunciou este conteúdo.'}), 409
 
+        self.__notificar_admins(tipo, alvo_id, usuario.get('email'))
+
         return jsonify({'mensagem': 'Denúncia enviada. Obrigado por ajudar a manter a comunidade segura!'}), 201
 
     def listar_denuncias(self):
@@ -69,7 +80,6 @@ class DenunciaController:
         limite = max(1, min(limite, LIMITE_MAXIMO))
         offset = max(0, offset)
 
-        # busca 1 a mais só para saber se existe próxima página
         itens = self.__dao_denuncia.listar(limite + 1, offset)
         tem_mais = len(itens) > limite
         itens = itens[:limite]
@@ -85,7 +95,6 @@ class DenunciaController:
         if not denuncia:
             return jsonify({'erro': 'Denúncia não encontrada.'}), 404
 
-        # as denúncias do alvo são removidas em cascata pelo banco
         if denuncia.tipo == 'postagem':
             self.__dao_postagem.excluir_postagem(denuncia.alvo_id)
             mensagem = 'Denúncia aprovada. A postagem foi excluída.'

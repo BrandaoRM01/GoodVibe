@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ApiError } from "@/lib/api";
 import { ComentariosModal } from "@/components/ComentariosModal";
 import { DenunciarModal } from "@/components/DenunciarModal";
+import { CompartilharModal } from "@/components/CompartilharModal";
 import { BotaoSeguir } from "@/components/BotaoSeguir";
 
 const MAX_TAGS_EDICAO = 5;
@@ -41,11 +42,17 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
 
   const [comentariosAbertos, setComentariosAbertos] = useState(false);
   const [denunciaAberta, setDenunciaAberta] = useState(false);
+  const [compartilharAberto, setCompartilharAberto] = useState(false);
   const [totalComentarios, setTotalComentarios] = useState(post.comments);
+  const [totalShares, setTotalShares] = useState(post.shares);
 
   useEffect(() => {
     setTotalComentarios(post.comments);
   }, [post.comments]);
+
+  useEffect(() => {
+    setTotalShares(post.shares);
+  }, [post.shares]);
 
   const [menuAberto, setMenuAberto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -339,7 +346,11 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
               label={String(totalComentarios)}
               onClick={() => setComentariosAbertos(true)}
             />
-            <Action icon={<Share2 className="h-4 w-4" />} label={String(post.shares)} />
+            <Action
+              icon={<Share2 className="h-4 w-4" />}
+              label={String(totalShares)}
+              onClick={() => setCompartilharAberto(true)}
+            />
           </footer>
         </>
       )}
@@ -491,6 +502,12 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
         onFechar={() => setDenunciaAberta(false)}
         tipo="postagem"
         alvoId={Number(post.id)}
+      />
+      <CompartilharModal
+        postagemId={Number(post.id)}
+        aberto={compartilharAberto}
+        onFechar={() => setCompartilharAberto(false)}
+        onEnviado={() => setTotalShares((n) => n + 1)}
       />
     </motion.article>
   );

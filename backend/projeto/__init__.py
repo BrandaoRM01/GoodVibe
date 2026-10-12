@@ -10,25 +10,36 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    app.config.setdefault('SECRET_KEY', os.environ.get('SECRET_KEY', 'secret_key_para_caso_não_seja_informada'))
+    app.config.setdefault('SECRET_KEY', os.environ.get('SECRET_KEY', 'secret_key_goodvibe'))
+
+    origens_permitidas = [
+        "https://SEU-PROJETO.lovable.app",
+        "http://localhost:8080",
+        "http://localhost:8081",
+        "http://localhost:5173",
+    ]
 
     CORS(
         app,
-        resources={r"/api/*": {"origins": [
-            "https://SEU-PROJETO.lovable.app",
-            "http://localhost:8080",
-             "http://localhost:5173",
-        ]}},
+        resources={r"/api/*": {"origins": origens_permitidas}},
         supports_credentials=False,
     )
 
-    from projeto.blueprints import user_bp, postagem_bp, comentario_bp, denuncia_bp, seguidor_bp, assistente_bp
+    from projeto.realtime import socketio
+    socketio.init_app(app, cors_allowed_origins=origens_permitidas, async_mode='threading')
+
+    from projeto.blueprints import (
+        user_bp, postagem_bp, comentario_bp, denuncia_bp, seguidor_bp, assistente_bp,
+        mensagem_bp, notificacao_bp
+    )
     app.register_blueprint(user_bp)
     app.register_blueprint(postagem_bp)
     app.register_blueprint(comentario_bp)
     app.register_blueprint(denuncia_bp)
     app.register_blueprint(seguidor_bp)
     app.register_blueprint(assistente_bp)
+    app.register_blueprint(mensagem_bp)
+    app.register_blueprint(notificacao_bp)
 
     @app.route('/uploads/<path:subpath>')
     def servir_uploads(subpath):

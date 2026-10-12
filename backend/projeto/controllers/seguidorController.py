@@ -1,10 +1,12 @@
-from flask import jsonify, request
-from projeto.dao import SeguidorDAO, UserDAO
+from flask import jsonify, request, current_app
+from projeto.dao import SeguidorDAO, UserDAO, NotificacaoDAO
+from projeto.realtime import emitir_para_usuario
 
 class SeguidorController:
     def __init__(self):
         self.__dao_seguidor = SeguidorDAO()
         self.__dao_usuario = UserDAO()
+        self.__dao_notificacao = NotificacaoDAO()
 
     def __resposta(self, email_alvo, seguindo, mensagem):
         contagens = self.__dao_seguidor.buscar_contagens(email_alvo)
@@ -23,18 +25,43 @@ class SeguidorController:
             return jsonify({'erro': 'Usuário não encontrado.'}), 404
         return None
 
+    def __avisar_relacao_alterada(self, a, b):
+        try:
+            emitir_para_usuario(a, 'conversas:atualizar', {})
+            emitir_para_usuario(b, 'conversas:atualizar', {})
+        except Exception:
+            current_app.logger.exception('Falha ao emitir atualização de conversas')
+
+    def __notificar_novo_seguidor(self, seguidor_email, seguido_email):
+        try:
+            notificacao = self.__dao_notificacao.registrar_seguidor(seguidor_email, seguido_email)
+            emitir_para_usuario(seguido_email, 'notificacao:nova', {'notificacao': notificacao})
+        except Exception:
+            current_app.logger.exception('Falha ao notificar novo seguidor')
+
     def seguir(self, email):
         erro = self.__validar_alvo(email)
         if erro:
             return erro
-        self.__dao_seguidor.seguir(request.usuario_atual.get('email'), email)
+
+        eu = request.usuario_atual.get('email')
+        novo = self.__dao_seguidor.seguir(eu, email)
+
+        if novo:
+            self.__notificar_novo_seguidor(eu, email)
+            self.__avisar_relacao_alterada(eu, email)
+
         return self.__resposta(email, True, 'Agora você está seguindo este usuário.')
 
     def deixar_de_seguir(self, email):
         erro = self.__validar_alvo(email)
         if erro:
             return erro
-        self.__dao_seguidor.deixar_de_seguir(request.usuario_atual.get('email'), email)
+
+        eu = request.usuario_atual.get('email')
+        if self.__dao_seguidor.deixar_de_seguir(eu, email):
+            self.__avisar_relacao_alterada(eu, email)
+
         return self.__resposta(email, False, 'Você deixou de seguir este usuário.')
 
     def ids_seguindo(self):
@@ -73,5 +100,7 @@ class SeguidorController:
         if not self.__dao_usuario.buscar_usuario_por_email(email):
             return jsonify({'erro': 'Usuário não encontrado.'}), 404
 
-        self.__dao_seguidor.deixar_de_seguir(email, eu)
+        if self.__dao_seguidor.deixar_de_seguir(email, eu):
+            self.__avisar_relacao_alterada(eu, email)
+
         return self.__resposta(eu, False, 'Seguidor removido com sucesso.')

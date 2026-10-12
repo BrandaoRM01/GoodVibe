@@ -4,3 +4,5 @@ from .comentarioController import ComentarioController
 from .denunciaController import DenunciaController
 from .seguidorController import SeguidorController
 from .assistenteController import AssistenteController
+from .mensagemController import MensagemController
+from .notificacaoController import NotificacaoController

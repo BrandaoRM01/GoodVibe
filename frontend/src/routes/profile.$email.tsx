@@ -6,6 +6,7 @@ import { ProfileView, mapPostagemParaPost } from "@/components/ProfileView";
 import { useFeed } from "@/lib/use-postagens";
 import { useUsuarioAtual, useUsuarioPorEmail } from "@/lib/use-auth";
 import { BotaoSeguir } from "@/components/BotaoSeguir";
+import { BotaoMensagem } from "@/components/BotaoMensagem";
 import { RotaProtegida } from "@/components/RotaProtegida";
 
 export const Route = createFileRoute("/profile/$email")({
@@ -79,7 +80,12 @@ function PerfilPublicoConteudo() {
                     carregandoFeed={carregandoFeed}
                     abaAtiva={abaAtiva}
                     onMudarAba={setAbaAtiva}
-                    actions={<BotaoSeguir email={usuario.email} grande />}
+                    actions={
+                        <>
+                            <BotaoSeguir email={usuario.email} grande />
+                            <BotaoMensagem email={usuario.email} username={usuario.username} />
+                        </>
+                    }
                 />
             </main>
             <MobileNav />

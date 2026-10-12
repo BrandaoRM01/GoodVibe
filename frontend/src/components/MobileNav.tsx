@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, MessageCircle, User, ShieldCheck, Compass, Bot } from "lucide-react";
 import { motion } from "framer-motion";
 import { useUsuarioAtual } from "@/lib/use-auth";
+import { useNaoLidasMensagens } from "@/lib/use-mensagens";
 import { ehAdmin } from "@/components/RotaProtegida";
 
 const items = [
@@ -16,6 +17,7 @@ const items = [
 export function MobileNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const { data: usuario } = useUsuarioAtual();
+  const { data: naoLidasMensagens = 0 } = useNaoLidasMensagens();
   const itensVisiveis = items.filter((it) => !it.somenteAdmin || ehAdmin(usuario));
 
   return (
@@ -23,6 +25,7 @@ export function MobileNav() {
       <ul className="flex items-center justify-around">
         {itensVisiveis.map((it, i) => {
           const isActive = path === it.to && i === 0 ? path === "/feed" : path === it.to;
+          const badge = it.to === "/messages" ? naoLidasMensagens : 0;
           return (
             <li key={it.label + i}>
               <Link
@@ -37,7 +40,14 @@ export function MobileNav() {
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
-                <it.icon className="h-5 w-5 relative" />
+                <span className="relative">
+                  <it.icon className="h-5 w-5" />
+                  {badge > 0 && (
+                    <span className="absolute -top-1.5 -right-2.5 h-4 min-w-4 px-1 rounded-full gradient-primary text-primary-foreground text-[10px] font-bold grid place-items-center">
+                      {badge}
+                    </span>
+                  )}
+                </span>
                 <span className="text-[10px] font-semibold relative">{it.label}</span>
               </Link>
             </li>

@@ -4,6 +4,8 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useUsuarioAtual } from "@/lib/use-auth";
+import { useNaoLidasMensagens } from "@/lib/use-mensagens";
+import { useNaoLidasNotificacoes } from "@/lib/use-notificacoes";
 import { ehAdmin } from "@/components/RotaProtegida";
 
 const items = [
@@ -21,7 +23,15 @@ export function AppSidebar() {
   const navigate = useNavigate();
 
   const { data: usuario } = useUsuarioAtual();
+  const { data: naoLidasMensagens = 0 } = useNaoLidasMensagens();
+  const { data: naoLidasNotificacoes = 0 } = useNaoLidasNotificacoes();
   const itensVisiveis = items.filter((it) => !it.somenteAdmin || ehAdmin(usuario));
+
+  function contagem(label: string) {
+    if (label === "Mensagens") return naoLidasMensagens;
+    if (label === "Notificações") return naoLidasNotificacoes;
+    return 0;
+  }
 
   return (
     <aside className="hidden md:flex sticky top-0 h-dvh overflow-hidden w-20 lg:w-64 shrink-0 flex-col gap-2 border-r border-border bg-sidebar/60 backdrop-blur-xl px-3 lg:px-4 py-4">
@@ -38,6 +48,7 @@ export function AppSidebar() {
         {itensVisiveis.map((it, i) => {
           const active = path === it.to && i === 0 ? true : path.startsWith(it.to) && it.to !== "/feed";
           const isActive = path === it.to;
+          const badge = contagem(it.label);
           return (
             <Link
               key={it.label + i}
@@ -55,7 +66,14 @@ export function AppSidebar() {
                   transition={{ type: "spring", stiffness: 350, damping: 30 }}
                 />
               )}
-              <it.icon className="h-5 w-5 shrink-0" />
+              <span className="relative shrink-0">
+                <it.icon className="h-5 w-5" />
+                {badge > 0 && (
+                  <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 rounded-full gradient-primary text-primary-foreground text-[10px] font-bold grid place-items-center">
+                    {badge}
+                  </span>
+                )}
+              </span>
               <span className="hidden lg:inline text-sm">{it.label}</span>
             </Link>
           );

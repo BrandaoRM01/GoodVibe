@@ -7,8 +7,10 @@ import { Composer } from "@/components/Composer";
 import { PostCard, type Post } from "@/components/PostCard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BuscaModal } from "@/components/BuscaModal";
+import { NotificacoesModal } from "@/components/NotificacoesModal";
 import { Search, Bell } from "lucide-react";
 import { useFeed } from "@/lib/use-postagens";
+import { useNaoLidasNotificacoes } from "@/lib/use-notificacoes";
 import type { PostagemAPI } from "@/lib/postagens";
 import { API_URL } from "@/lib/api";
 import { X } from "lucide-react";
@@ -87,6 +89,8 @@ function FeedConteudo() {
   const gruposPresentes = new Set((postagens ?? []).map((p) => p.grupoRede ?? 2));
   const mostrarTitulos = !autor && !(gruposPresentes.size === 1 && gruposPresentes.has(2));
   const [buscaAberta, setBuscaAberta] = useState(false);
+  const [notificacoesAbertas, setNotificacoesAbertas] = useState(false);
+  const { data: naoLidasNotificacoes = 0 } = useNaoLidasNotificacoes();
 
   function limparTag() {
     navigate({ search: (prev) => ({ ...prev, tag: undefined }) });
@@ -114,9 +118,18 @@ function FeedConteudo() {
           >
             <Search className="h-4 w-4" />
           </button>
-          <button className="h-10 w-10 rounded-full border border-border bg-card hover:bg-accent grid place-items-center transition-colors relative">
+          <button
+            type="button"
+            onClick={() => setNotificacoesAbertas(true)}
+            aria-label="Notificações"
+            className="h-10 w-10 rounded-full border border-border bg-card hover:bg-accent grid place-items-center transition-colors relative"
+          >
             <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+            {naoLidasNotificacoes > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full gradient-primary text-primary-foreground text-[10px] font-bold grid place-items-center">
+                {naoLidasNotificacoes}
+              </span>
+            )}
           </button>
           <ThemeToggle />
         </header>
@@ -157,6 +170,7 @@ function FeedConteudo() {
       <MobileNav />
       <RightRail />
       <BuscaModal aberto={buscaAberta} onFechar={() => setBuscaAberta(false)} />
+      <NotificacoesModal aberto={notificacoesAbertas} onFechar={() => setNotificacoesAbertas(false)} />
     </div>
   );
 }

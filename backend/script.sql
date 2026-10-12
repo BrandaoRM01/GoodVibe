@@ -125,6 +125,62 @@ CREATE TABLE IF NOT EXISTS seguidores (
     INDEX idx_seguidores_seguidor (seguidor_email, criado_em)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS conversas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_a_email VARCHAR(150) NOT NULL,
+    usuario_b_email VARCHAR(150) NOT NULL,
+    ultima_mensagem_em DATETIME(3) DEFAULT NULL,
+
+    FOREIGN KEY (usuario_a_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_b_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+
+    UNIQUE KEY uq_conversa_par (usuario_a_email, usuario_b_email),
+    INDEX idx_conversas_b (usuario_b_email, usuario_a_email),
+    CONSTRAINT ck_conversa_distintos CHECK (usuario_a_email <> usuario_b_email)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS mensagens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    conversa_id INT NOT NULL,
+    remetente_email VARCHAR(150) NOT NULL,
+    tipo ENUM('texto', 'postagem') NOT NULL DEFAULT 'texto',
+    conteudo VARCHAR(2000) DEFAULT NULL,
+    postagem_id INT DEFAULT NULL,
+    client_id VARCHAR(40) DEFAULT NULL,
+    lida_em DATETIME(3) DEFAULT NULL,
+    criado_em DATETIME(3) NOT NULL,
+
+    FOREIGN KEY (conversa_id) REFERENCES conversas(id) ON DELETE CASCADE,
+    FOREIGN KEY (remetente_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE SET NULL,
+
+    UNIQUE KEY uq_mensagem_client (conversa_id, remetente_email, client_id),
+    INDEX idx_mensagens_conversa (conversa_id, id),
+    INDEX idx_mensagens_nao_lidas (conversa_id, remetente_email, lida_em)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS notificacoes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    destinatario_email VARCHAR(150) NOT NULL,
+    tipo ENUM('seguidor', 'mensagem', 'denuncia') NOT NULL,
+    autor_email VARCHAR(150) DEFAULT NULL,
+    conversa_id INT DEFAULT NULL,
+    denuncia_id INT DEFAULT NULL,
+    qtd INT UNSIGNED NOT NULL DEFAULT 1,
+    lida TINYINT(1) NOT NULL DEFAULT 0,
+    chave VARCHAR(320) DEFAULT NULL,
+    criado_em DATETIME(3) NOT NULL,
+
+    FOREIGN KEY (destinatario_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+    FOREIGN KEY (autor_email) REFERENCES usuarios(email) ON DELETE CASCADE,
+    FOREIGN KEY (conversa_id) REFERENCES conversas(id) ON DELETE CASCADE,
+    FOREIGN KEY (denuncia_id) REFERENCES denuncias(id) ON DELETE CASCADE,
+
+    UNIQUE KEY uq_notificacao_chave (chave),
+    INDEX idx_notificacoes_destinatario (destinatario_email, lida, criado_em),
+    INDEX idx_notificacoes_lista (destinatario_email, criado_em, id)
+) ENGINE=InnoDB;
+
 CREATE OR REPLACE VIEW vw_postagens AS
 SELECT
     p.id, p.conteudo, p.url_imagem, p.boa_acao,
