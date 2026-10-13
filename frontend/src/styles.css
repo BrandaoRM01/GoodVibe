@@ -59,7 +59,7 @@
     --shadow-glow: 0 10px 40px -10px color-mix(in oklab, var(--primary) 35%, transparent);
   }
 
-   :root {
+  :root {
     --radius: 1.25rem;
 
     --background: oklch(0.9 0.012 340);
@@ -109,6 +109,8 @@
     --sidebar-accent-foreground: oklch(0.18 0.03 340);
     --sidebar-border: oklch(0.84 0.02 340);
     --sidebar-ring: oklch(0.6 0.22 0);
+
+    --vlibras-btn-focus-visible-shadow: 0 0 10px 4px var(--primary);
   }
 
   .dark {
@@ -159,16 +161,24 @@
     --sidebar-accent-foreground: oklch(0.97 0.005 340);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.74 0.24 5);
+
+    --vlibras-btn-focus-visible-shadow: 0 0 10px 4px var(--primary);
   }
 
   @layer base {
-    * { border-color: var(--color-border); }
-
-    html {
-      font-size: 18px; /* base maior */
+    * {
+      border-color: var(--color-border);
     }
 
-    html, body { font-family: var(--font-sans); }
+    html {
+      font-size: 18px;
+      /* base maior */
+    }
+
+    html,
+    body {
+      font-family: var(--font-sans);
+    }
 
     body {
       background-color: var(--color-background);
@@ -181,37 +191,44 @@
       background-attachment: fixed;
     }
 
-    ::selection { background: color-mix(in oklab, var(--primary) 35%, transparent); }
+    ::selection {
+      background: color-mix(in oklab, var(--primary) 35%, transparent);
+    }
   }
 
   @layer utilities {
     .gradient-primary {
       background-image: linear-gradient(135deg, var(--primary), var(--primary-glow));
     }
+
     .gradient-text {
       background: linear-gradient(135deg, var(--primary), var(--primary-glow));
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
+
     .glass {
       background: color-mix(in oklab, var(--card) 70%, transparent);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
-    .shadow-soft { box-shadow: var(--shadow-soft); }
-    .shadow-glow { box-shadow: var(--shadow-glow); }
-    .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+
+    .shadow-soft {
+      box-shadow: var(--shadow-soft);
+    }
+
+    .shadow-glow {
+      box-shadow: var(--shadow-glow);
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
     .scrollbar-thin::-webkit-scrollbar-thumb {
       background: color-mix(in oklab, var(--primary) 35%, transparent);
       border-radius: 9999px;
     }
   }
-
-@font-face {
-  font-family: 'Plus Jakarta Sans';
-  font-style: normal;
-  font-weight: 200 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU79TItq-EYtxpbEYxA.woff2) format('woff2');
-}

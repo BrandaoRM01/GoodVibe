@@ -227,6 +227,7 @@ export function PostCard({ post, index = 0 }: { post: Post; index?: number }) {
 
   return (
     <motion.article
+      data-voz-bloco={`Publicação de ${post.author}`}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.05 }}

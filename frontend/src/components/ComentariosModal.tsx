@@ -397,7 +397,7 @@ function ComentarioItem({ comentario }: { comentario: ComentarioAPI }) {
   }
 
   return (
-    <div>
+    <div data-voz-bloco={`Comentário de ${comentario.author}`}>
       <div className="flex gap-3">
         <Avatar
           url={comentario.avatarUrl}

@@ -11,6 +11,9 @@ import {
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/lib/theme";
 import { Toaster } from "@/components/ui/sonner";
+import { VLibras } from "@/components/VLibras";
+import { AssistenteVozProvider } from "@/lib/voz/assistente-voz";
+import { AssistenteVoz } from "@/components/AssistenteVoz";
 
 function NotFoundComponent() {
   return (
@@ -114,6 +117,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
     ],
+    scripts: [
+      { src: "https://vlibras.gov.br/app/vlibras-plugin.js", defer: true },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -123,7 +129,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -141,8 +147,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Outlet />
-        <Toaster />
+        <AssistenteVozProvider>
+          <Outlet />
+          <Toaster />
+          <VLibras />
+          <AssistenteVoz />
+        </AssistenteVozProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

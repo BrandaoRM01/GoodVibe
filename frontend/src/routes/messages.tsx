@@ -199,10 +199,10 @@ function ListaConversas({
                   </div>
                   <p
                     className={`text-xs truncate ${c.naoLidas > 0
-                        ? "text-foreground font-medium"
-                        : c.ultimaMensagem
-                          ? "text-muted-foreground"
-                          : "text-muted-foreground/70 italic"
+                      ? "text-foreground font-medium"
+                      : c.ultimaMensagem
+                        ? "text-muted-foreground"
+                        : "text-muted-foreground/70 italic"
                       }`}
                   >
                     {previaConversa(c, usuarioAtual?.email)}
@@ -500,8 +500,8 @@ function PainelConversa({
             aria-pressed={ouvindo}
             title={ouvindo ? "Parar de ouvir" : "Falar mensagem"}
             className={`h-9 w-9 shrink-0 rounded-full grid place-items-center transition disabled:opacity-50 ${ouvindo
-                ? "bg-destructive text-destructive-foreground animate-pulse"
-                : "bg-accent text-foreground hover:bg-accent/70"
+              ? "bg-destructive text-destructive-foreground animate-pulse"
+              : "bg-accent text-foreground hover:bg-accent/70"
               }`}
           >
             {ouvindo ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
@@ -543,6 +543,7 @@ function Bolha({
 
   return (
     <motion.div
+      data-voz-bloco={minha ? "Mensagem enviada por você" : "Mensagem recebida"}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
@@ -552,9 +553,10 @@ function Bolha({
         <CartaoPostagemCompartilhada postagem={m.postagem!} />
       ) : (
         <div
+          data-voz-texto=""
           className={`max-w-[85%] sm:max-w-[70%] px-4 py-2.5 rounded-3xl text-sm whitespace-pre-wrap break-words ${minha
-              ? `gradient-primary text-primary-foreground rounded-br-md shadow-soft ${m.status === "enviando" ? "opacity-70" : ""}`
-              : "bg-card border border-border rounded-bl-md"
+            ? `gradient-primary text-primary-foreground rounded-br-md shadow-soft ${m.status === "enviando" ? "opacity-70" : ""}`
+            : "bg-card border border-border rounded-bl-md"
             }`}
         >
           {m.conteudo}
