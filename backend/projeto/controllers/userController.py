@@ -89,7 +89,7 @@ class UserController:
             return jsonify({'erro': 'Não foi possível validar a senha informada.'}), 400
 
         if not foto or foto.filename == "":
-            nome_arquivo = "img/default/user_foto.webp"
+            nome_arquivo = None
         else:
             extensao = os.path.splitext(foto.filename)[1]
             nome_ajustado = secure_filename(username.lower().replace(" ", "_"))
