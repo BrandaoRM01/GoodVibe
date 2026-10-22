@@ -266,6 +266,10 @@ export function AssistenteVozProvider({ children }: { children: ReactNode }) {
         if (!carregado || !prefs.ativo) return;
         const aoClicar = (e: MouseEvent) => {
             if (e.button !== 0) return;
+
+            const alvo = e.target;
+            if (alvo instanceof Element && alvo.closest('input[type="file"]')) return;
+
             const agora = Date.now();
             if (agora - ultimoClique.current < 120) return; // clique sintético de <label>
             const texto = textoParaLer(e.target);

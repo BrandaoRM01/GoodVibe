@@ -19,8 +19,12 @@ _SQL_CONVERSAS = """
         u.email, u.username, u.url_foto,
         EXISTS(
             SELECT 1 FROM seguidores r
-            WHERE r.seguidor_email = u.email AND r.seguido_email = %s
+            WHERE r.seguidor_email = u.email AND r.seguido_email = %(eu)s
         ) AS segue_de_volta,
+        EXISTS(
+            SELECT 1 FROM seguidores q
+            WHERE q.seguidor_email = %(eu)s AND q.seguido_email = u.email
+        ) AS eu_sigo,
         c.id AS conversa_id,
         c.ultima_mensagem_em,
         lm.tipo AS lm_tipo, lm.conteudo AS lm_conteudo, lm.remetente_email AS lm_remetente,
@@ -28,15 +32,24 @@ _SQL_CONVERSAS = """
             SELECT COUNT(*) FROM mensagens x
             WHERE x.conversa_id = c.id AND x.remetente_email = u.email AND x.lida_em IS NULL
         ) AS nao_lidas
-    FROM seguidores s
-    INNER JOIN usuarios u ON u.email = s.seguido_email
+    FROM (
+        SELECT seguido_email AS email
+        FROM seguidores
+        WHERE seguidor_email = %(eu)s
+        UNION
+        SELECT CASE WHEN usuario_a_email = %(eu)s THEN usuario_b_email ELSE usuario_a_email END
+        FROM conversas
+        WHERE (usuario_a_email = %(eu)s OR usuario_b_email = %(eu)s)
+          AND ultima_mensagem_em IS NOT NULL
+    ) contatos
+    INNER JOIN usuarios u ON u.email = contatos.email
     LEFT JOIN conversas c
-        ON (c.usuario_a_email = s.seguidor_email AND c.usuario_b_email = u.email)
-        OR (c.usuario_a_email = u.email AND c.usuario_b_email = s.seguidor_email)
+        ON (c.usuario_a_email = %(eu)s AND c.usuario_b_email = u.email)
+        OR (c.usuario_a_email = u.email AND c.usuario_b_email = %(eu)s)
     LEFT JOIN mensagens lm
         ON lm.id = (SELECT MAX(y.id) FROM mensagens y WHERE y.conversa_id = c.id)
-    WHERE s.seguidor_email = %s
     ORDER BY segue_de_volta DESC,
+             eu_sigo DESC,
              (c.ultima_mensagem_em IS NULL) ASC,
              c.ultima_mensagem_em DESC,
              lm.id DESC,
@@ -231,7 +244,7 @@ class MensagemDAO(BaseDAO):
         conexao = self._get_connection()
         cursor = conexao.cursor(dictionary=True)
         try:
-            cursor.execute(_SQL_CONVERSAS, (email, email))
+            cursor.execute(_SQL_CONVERSAS, {'eu': email})
             linhas = cursor.fetchall()
         finally:
             cursor.close()
@@ -249,6 +262,7 @@ class MensagemDAO(BaseDAO):
             conversas.append({
                 'usuario': {'email': l['email'], 'username': l['username'], 'url_foto': l['url_foto']},
                 'segueDeVolta': bool(l['segue_de_volta']),
+                'euSigo': bool(l['eu_sigo']),
                 'conversaId': l['conversa_id'],
                 'naoLidas': int(l['nao_lidas'] or 0),
                 'ultimaAtividade': self.iso_utc(l['ultima_mensagem_em']),

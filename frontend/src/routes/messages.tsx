@@ -170,13 +170,18 @@ function ListaConversas({
         )}
 
         {lista.map((c, i) => {
-          const novoGrupo = i === 0 || lista[i - 1].segueDeVolta !== c.segueDeVolta;
+          const chaveGrupo = (x: ConversaListaAPI) => `${x.segueDeVolta}-${x.euSigo}`;
+          const novoGrupo = i === 0 || chaveGrupo(lista[i - 1]) !== chaveGrupo(c);
           const selecionada = ativo?.toLowerCase() === c.usuario.email.toLowerCase();
           return (
             <Fragment key={c.usuario.email}>
               {novoGrupo && (
                 <h2 className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {c.segueDeVolta ? "Seguem você de volta" : "Você segue"}
+                  {c.segueDeVolta && c.euSigo
+                    ? "Seguem você de volta"
+                    : c.segueDeVolta
+                      ? "Mensagens de quem você não segue"
+                      : "Você segue"}
                 </h2>
               )}
               <button

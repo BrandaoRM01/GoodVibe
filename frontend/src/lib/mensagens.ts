@@ -42,6 +42,7 @@ export interface ConversaListaAPI {
     conversaId: number | null;
     naoLidas: number;
     ultimaAtividade: string | null;
+    euSigo: boolean;
     ultimaMensagem: {
         tipo: "texto" | "postagem";
         conteudo: string | null;
